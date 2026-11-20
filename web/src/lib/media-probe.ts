@@ -1,22 +1,11 @@
 import { execFile } from "node:child_process";
-import { existsSync } from "node:fs";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { promisify } from "node:util";
+import { ffBin } from "@/lib/ffmpeg-bin";
 const run = promisify(execFile);
-
-// Vercel has no system ffprobe. Remotion ships one with the renderer (Linux glibc build), so use it when
-// present; FFPROBE_PATH overrides; plain "ffprobe" on PATH is the last resort (local dev, the worker image).
-function ffprobe(): { bin: string; env: NodeJS.ProcessEnv } {
-  if (process.env.FFPROBE_PATH) return { bin: process.env.FFPROBE_PATH, env: process.env };
-  const dir = path.join(process.cwd(), "node_modules/@remotion/compositor-linux-x64-gnu");
-  if (existsSync(path.join(dir, "ffprobe"))) {
-    return { bin: path.join(dir, "ffprobe"), env: { ...process.env, LD_LIBRARY_PATH: [dir, process.env.LD_LIBRARY_PATH].filter(Boolean).join(":") } };
-  }
-  return { bin: "ffprobe", env: process.env };
-}
 
 // Remotion's ffprobe is built without TLS. For https inputs, serve the file on a loopback http port that
 // forwards Range requests, so ffprobe reads only the bytes it needs (headers, plus the index at the end of
@@ -52,7 +41,7 @@ async function asHttp<T>(input: string, fn: (url: string) => Promise<T>): Promis
 /** Width, height and duration from ffprobe. Accepts a local path or a (signed) https URL. */
 export async function probe(input: string): Promise<{ width: number | null; height: number | null; durationMs: number | null } | null> {
   try {
-    const { bin, env } = ffprobe();
+    const { bin, env } = ffBin("ffprobe");
     const { stdout } = await asHttp(input, (src) => run(bin, ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height:format=duration", "-of", "json", src], { timeout: 30_000, env }));
     const j = JSON.parse(stdout);
     if (!j.streams?.length) return null;

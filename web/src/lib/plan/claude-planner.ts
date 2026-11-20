@@ -10,6 +10,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { Asset } from "@/lib/data/types";
 import { toLocalFile } from "@/lib/storage";
+import { ffBin } from "@/lib/ffmpeg-bin";
 import { Plan, type Plan as PlanT } from "./schema";
 
 const run = promisify(execFile);
@@ -55,7 +56,8 @@ async function previewJpeg(file: string, seekSeconds: number | null): Promise<st
   const out = path.join(dir, "p.jpg");
   try {
     const args = ["-v", "error", "-y", ...(seekSeconds !== null ? ["-ss", String(seekSeconds)] : []), "-i", file, "-frames:v", "1", "-vf", "scale='min(512,iw)':-2", "-q:v", "5", out];
-    await run("ffmpeg", args);
+    const { bin, env } = ffBin("ffmpeg");
+    await run(bin, args, { env, timeout: 30_000 });
     return (await readFile(out)).toString("base64");
   } finally { await rm(dir, { recursive: true, force: true }); }
 }
