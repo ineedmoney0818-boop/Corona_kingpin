@@ -86,10 +86,11 @@
 | --- | --- | --- |
 | Claude planner, live | no API key here; Anthropic keys can't go through this session's secret form | create a key at console.anthropic.com, set `ANTHROPIC_API_KEY` on the host (and in an env var here if you want me to test it) |
 | Google sign-in | needs your Google Cloud OAuth client | create an OAuth client (Web), add the Supabase callback URL, paste the client id/secret into Supabase → Auth → Providers → Google. Basic scopes (email, profile) need **brand verification** for your logo/name on the consent screen; start it early, it can take days |
-| Stripe Checkout and Portal against real Stripe | no test key here | create the 4 plan prices + 2 credit packs with the **lookup keys** in `launch/pricing.md`; turn on the Customer Portal with "cancel at period end"; add a webhook endpoint for `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.paid`, `invoice.payment_failed` |
-| `invoice.paid` grant path | it fetches the subscription from Stripe's API | covered once the test key exists |
-| Sending real email | no Resend key or domain | verify your domain in Resend, set `RESEND_API_KEY` and `EMAIL_FROM`. In Supabase, set custom SMTP (Resend) so auth emails come from your domain too |
-| Backups | no hosted project yet | Supabase Pro has daily backups. **Check they're on**; the free plan has none |
+| Stripe test-mode objects | **done 2026-11-20** in test mode: 4 products, 6 prices with the lookup keys from `launch/pricing.md`, default Customer Portal (cancel at period end, plan switch between the 4 plan prices, card/invoices/email+address). A test Checkout session from `creator_monthly` was created successfully | nothing |
+| Stripe webhook endpoint | there's no deployed URL to point it at | after deploy: add `https://<domain>/api/webhooks/stripe` for `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.paid`, `invoice.payment_failed`; put its signing secret in `STRIPE_WEBHOOK_SECRET`. Then run the manual card tests F06-M1..M3 |
+| `invoice.paid` grant path | needs the webhook above | covered once the webhook delivers |
+| Sending real email | Resend key is connected but **send-only**, and no verified domain was visible to it | verify your domain in Resend, set `RESEND_API_KEY` and `EMAIL_FROM`. In Supabase, set custom SMTP (Resend) so auth emails come from your domain too |
+| Backups | hosted project exists (us-east-2); every object from the 3 repo migrations is applied, under different migration names (`init`, `grants_for_server_role`, `harden_functions`) | Supabase Pro has daily backups. **Check they're on**; the free plan has none |
 
 ## Security checklist
 
