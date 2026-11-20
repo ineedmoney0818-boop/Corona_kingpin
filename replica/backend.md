@@ -85,6 +85,23 @@
 - **Credits never granted, top-ups never added, failed renders never refunded.** The init migration revoked `spend_credits`, `refund_render`, `grant_monthly_credits` and `add_topup` from every role and never granted them to `service_role`. Local Postgres hid it; hosted Supabase returned "permission denied" on the first live `invoice.paid`. Fixed in `20261120000004_service_role_credit_grants.sql`, applied to the hosted DB, and verified: a live subscription upgrade granted 400 credits through the webhook. Browser roles still can't call them.
 - **Live checks passed:** sign-in, Claude ideas (5 ideas in 11 s, 1 credit charged once), Stripe webhook signature, subscription → plan sync.
 
+## Render worker on Railway
+
+`web/Dockerfile.worker` + `web/railway.json`. Tested locally against the live database: upload → Claude plan with real media → 1080×1920 reel in ~30 s; clean stop on SIGTERM.
+
+1. Railway → New Project → Deploy from GitHub repo → `Corona_kingpin`, branch `claude/affectionate-bohr-29srxq` (the repo has no `main` yet).
+2. Service → Settings → **Root Directory** `web`. Railway then reads `web/railway.json` and builds `Dockerfile.worker`. If the build log says Railpack/Nixpacks instead, add the variable `RAILWAY_DOCKERFILE_PATH=Dockerfile.worker`.
+3. Variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `NEXT_PUBLIC_SITE_URL` (same values as Vercel). No Anthropic or Stripe keys: planning and billing run on Vercel.
+4. No public domain or port: the worker only talks out to Supabase.
+5. Size: renders want ~2 GB RAM. One replica; a second one is safe (`claim_next_render` uses SKIP LOCKED) if the queue backs up.
+
+## Found in production, round 2 (2026-11-20)
+
+- **Every upload failed on Vercel** ("We couldn't read that file"): the upload check shells out to `ffprobe`, which Vercel doesn't have. **Every plan with media failed** for the same reason (`ffmpeg` for Claude's preview frames). Both now use the ffmpeg/ffprobe Remotion already ships (`src/lib/ffmpeg-bin.ts`, traced into those routes in `next.config.ts`). That build has no TLS, so https files are read through a loopback Range relay (no full download).
+- **Renders used a fallback typewriter font in a clean container**: the composition named Inter/Manrope but never loaded them. `src/remotion/index.ts` now bundles both and waits for them.
+- Upload keys now take their extension from the MIME type, since the probe picks image decoders by extension.
+- Lesson: the local sandbox has ffmpeg and both fonts installed system-wide, which hid all three. The worker image is now the reference environment.
+
 ## Not tested — needs your accounts
 
 | what | why untested | what you do |
