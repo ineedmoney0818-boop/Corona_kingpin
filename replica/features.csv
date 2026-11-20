@@ -21,9 +21,9 @@ Settings: profile and subscription management,account,must,yes,yes,"S14 | Plans,
 Monthly/yearly subscription plans with credits,billing,must,yes,partial,see launch/pricing.md for Reelplain tiers | Checkout + webhooks built; webhook logic tested with signed events; live Stripe untested
 Free tier (no card),billing,must,no,yes,"Reelplain addition; Limesnap has none | 10 credits on signup, watermark on exports"
 Brand voice from user's own Instagram via official Instagram Login API,onboarding,could,partial,no,replaces handle scraping
-Instagram profile scraping by handle (incl. other users),onboarding,skip,yes,no,SKIP: scraping is against Meta terms + legal risk; see recon Out of scope
-Limesnap's marketing-trained prompts/model,generation,skip,yes,no,SKIP: theirs; write own prompts
-Limesnap's public stock asset library,library,skip,yes,no,SKIP: licensed content; use Pexels/Pixabay
+Instagram profile scraping by handle (incl. other users),onboarding,could,yes,skip,SKIP: scraping is against Meta terms + legal risk; see recon Out of scope
+Limesnap's marketing-trained prompts/model,generation,could,yes,skip,SKIP: theirs; write own prompts
+Limesnap's public stock asset library,library,could,yes,skip,SKIP: licensed content; use Pexels/Pixabay
 Upfront pricing; no paywall on export of finished work (watermarked free export),billing,must,no,yes,fixes.md #1 - price/paywall 124 reviews | Cost on every button from a server quote; free exports carry watermark
 Auto-refund credits on failed render or rejected regeneration; show credit cost before action,billing,must,no,partial,"fixes.md #2 - credits 74 reviews | Refund on every failure path, in SQL, tested (error, missing file, stuck/reaper); 'rejected regeneration' refund not built"
 One-tap cancel in app and web; keep paid period and credits after cancel,billing,must,no,partial,fixes.md #3 - billing 63 reviews | Stripe Customer Portal; cancel-at-period-end handling tested via webhook; portal untested live
