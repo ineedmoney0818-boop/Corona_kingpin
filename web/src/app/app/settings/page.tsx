@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { getAccount, listLedger } from "@/lib/data";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { LocalDate } from "@/components/ui/LocalDate";
 import { ButtonLink } from "@/components/ui/Button";
 import { BillingButtons } from "@/components/settings/BillingButtons";
 import { DangerZone } from "@/components/settings/DangerZone";
@@ -44,7 +45,7 @@ async function Content() {
               const d = l.planDelta + l.topupDelta;
               return (
                 <tr key={l.id} className="border-t border-border">
-                  <td className="py-2 pr-2 whitespace-nowrap">{new Date(l.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</td>
+                  <td className="py-2 pr-2 whitespace-nowrap"><LocalDate iso={l.createdAt} /></td>
                   <td className="py-2 pr-2">{LABEL[l.kind]}{l.kind === "refund" ? " · render didn't finish" : ""}</td>
                   <td className={"py-2 text-right font-semibold tabular-nums " + (d >= 0 ? "text-success" : "")}>{d > 0 ? `+${d}` : d}</td>
                 </tr>

@@ -35,7 +35,7 @@ export function ReRender({ generationId, reason }: { generationId: string; reaso
   return (
     <div>
       {error && <Notice kind="danger" role="alert" className="mb-2">{error}</Notice>}
-      <Button onClick={go} disabled={!quote} loading={busy} aria-label={quote ? `Render again, uses ${quote.credits} credit` : "Render again, getting the price"}>
+      <Button onClick={go} disabled={!quote} loading={busy}>
         {reason === "retry" ? "Try again" : "Render my edits"} {quote && <CostChip credits={quote.credits} />}
       </Button>
     </div>

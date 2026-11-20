@@ -1,7 +1,7 @@
 import { test, expect, attach, makeReel, credits, a11y } from "./fixtures";
 import type { Page } from "@playwright/test";
 
-async function openEditor(page: Page) {
+async function openEditor(page: Page) { // caller must already be signed in (user fixture)
   await attach(page, ["photo.jpg", "desk.png"]);
   await makeReel(page, "Edit me later");
   await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
@@ -11,7 +11,7 @@ async function openEditor(page: Page) {
 }
 
 test.describe("F05 tweak a generated reel", () => {
-  test("F05-H1 edit, save free, render for 1 credit", async ({ page }) => {
+  test("F05-H1 edit, save free, render for 1 credit", async ({ page, user }) => {
     await openEditor(page);
     await a11y(page, "editor");
     await page.getByLabel("Text").fill("Edited on purpose");
@@ -21,13 +21,13 @@ test.describe("F05 tweak a generated reel", () => {
     await expect(page.getByText("All changes saved")).toBeVisible();
     expect(await credits(page)).toBe(6); // saving is free
     await page.getByRole("link", { name: /Render/ }).click();
-    await page.getByRole("button", { name: /Render again, uses 1 credit/ }).click();
+    await page.getByRole("button", { name: /Render my edits 1 credit/ }).click();
     await expect(page.getByText("Render history (2)")).toBeVisible({ timeout: 180_000 });
     await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
     expect(await credits(page)).toBe(5);
   });
 
-  test("F05-E1 two tabs: the second save is refused, not overwritten", async ({ page, context }) => {
+  test("F05-E1 two tabs: the second save is refused, not overwritten", async ({ page, context, user }) => {
     await openEditor(page);
     const url = page.url();
     const tabB = await context.newPage();
@@ -42,7 +42,7 @@ test.describe("F05 tweak a generated reel", () => {
     await expect(page.getByLabel("Text")).toHaveValue("From tab A");
   });
 
-  test("F05-E2 editor at phone width", async ({ page }) => {
+  test("F05-E2 editor at phone width", async ({ page, user }) => {
     await openEditor(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload();

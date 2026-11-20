@@ -7,7 +7,7 @@ const spendsFor = (email: string) => sql(`select count(*) from credit_ledger whe
 test.describe("F02 make a reel from my clips", () => {
   test("F02-H1 upload, make, render, download", async ({ page, user }) => {
     await attach(page, ["clip.mp4", "photo.jpg"]);
-    await expect(page.getByRole("button", { name: /Make reel, uses 4 credits/ })).toBeDisabled(); // no prompt yet
+    await expect(page.getByRole("button", { name: /Make reel 4 credits/ })).toBeDisabled(); // no prompt yet
     await makeReel(page, "3 things I do before 7am");
     await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
     expect(await credits(page)).toBe(6);
@@ -19,13 +19,13 @@ test.describe("F02 make a reel from my clips", () => {
     expect(spendsFor(user.email)).toBe("1");
   });
 
-  test("F02-E1 empty prompt keeps the button disabled", async ({ page }) => {
-    await expect(page.getByRole("button", { name: /Make reel, uses 4 credits/ })).toBeDisabled();
+  test("F02-E1 empty prompt keeps the button disabled", async ({ page, user }) => {
+    await expect(page.getByRole("button", { name: /Make reel 4 credits/ })).toBeDisabled();
     await page.getByLabel("What do you want to make?").fill("   ");
-    await expect(page.getByRole("button", { name: /Make reel, uses 4 credits/ })).toBeDisabled();
+    await expect(page.getByRole("button", { name: /Make reel 4 credits/ })).toBeDisabled();
   });
 
-  test("F02-E2 very long prompt with emoji", async ({ page }) => {
+  test("F02-E2 very long prompt with emoji", async ({ page, user }) => {
     const prompt = ("Morning ritual ☕️ with Zoë — " + "lorem ipsum ".repeat(200)).slice(0, 2000);
     await makeReel(page, prompt);
     await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
@@ -36,7 +36,7 @@ test.describe("F02 make a reel from my clips", () => {
 
   test("F02-E3 double click on the cost button charges once", async ({ page, user }) => {
     await page.getByLabel("What do you want to make?").fill("double click test");
-    await page.getByRole("button", { name: /Make reel, uses 4 credits/ }).dblclick();
+    await page.getByRole("button", { name: /Make reel 4 credits/ }).dblclick();
     await page.waitForURL("**/app/chats/**");
     await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
     expect(rendersFor(user.email)).toBe("1");
@@ -57,7 +57,7 @@ test.describe("F02 make a reel from my clips", () => {
     expect(sql(`select count(*) from messages where user_id = :'p1' and role = 'user'`, [userId(user.email)])).toBe("1");
   });
 
-  test("F02-E5 refresh mid-render keeps going", async ({ page }) => {
+  test("F02-E5 refresh mid-render keeps going", async ({ page, user }) => {
     await attach(page, ["clip.mp4"]);
     await makeReel(page, "refresh test");
     await page.reload();
@@ -73,7 +73,7 @@ test.describe("F02 make a reel from my clips", () => {
     expect(rendersFor(user.email)).toBe("1");
   });
 
-  test("F02-E7 offline upload fails on the chip, nothing charged", async ({ page, context }) => {
+  test("F02-E7 offline upload fails on the chip, nothing charged", async ({ page, context, user }) => {
     await context.setOffline(true);
     await page.setInputFiles("#composer-files", `${__dirname}/media/photo.jpg`);
     await expect(page.getByText(/Upload failed|Check your connection/)).toBeVisible();
@@ -81,10 +81,10 @@ test.describe("F02 make a reel from my clips", () => {
     expect(await credits(page)).toBe(10);
   });
 
-  test("F02-E8 slow network: button locks while starting", async ({ page }) => {
+  test("F02-E8 slow network: button locks while starting", async ({ page, user }) => {
     await page.route("**/api/generations", async (route) => { await new Promise((r) => setTimeout(r, 2500)); await route.continue(); });
     await page.getByLabel("What do you want to make?").fill("slow network");
-    await page.getByRole("button", { name: /Make reel, uses 4 credits/ }).click();
+    await page.getByRole("button", { name: /Make reel 4 credits/ }).click();
     await expect(page.getByRole("button", { name: /Make reel/ })).toBeDisabled();
     await expect(page.getByRole("button", { name: /Make reel/ })).toContainText("Starting…");
     await page.waitForURL("**/app/chats/**");
@@ -119,7 +119,7 @@ test.describe("F02 make a reel from my clips", () => {
     expect(sql(`select count(*) from chats where user_id = :'p1'`, [userId(user.email)])).toBe("0");
   });
 
-  test("F02-N2 wrong file type is refused before upload", async ({ page }) => {
+  test("F02-N2 wrong file type is refused before upload", async ({ page, user }) => {
     await page.setInputFiles("#composer-files", { name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
     await expect(page.getByText("Use a JPG, PNG or WebP photo, or an MP4, MOV or WebM video.")).toBeVisible();
   });

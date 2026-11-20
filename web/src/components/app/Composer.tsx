@@ -152,8 +152,7 @@ export function Composer({ chatId }: { chatId: string | null }) {
             <Link href="/app/settings#credits" className={buttonClass("secondary", "md")}>Get credits</Link>
           </span>
         ) : (
-        <Button type="submit" disabled={!canSend} loading={sending}
-          aria-label={liveQuote ? `${label}, uses ${liveQuote.credits} credit${liveQuote.credits === 1 ? "" : "s"}` : `${label}, getting the price`}>
+        <Button type="submit" disabled={!canSend} loading={sending}>
           {sending ? "Starting…" : label} {liveQuote ? <CostChip credits={liveQuote.credits} /> : <span className="text-xs opacity-80">pricing…</span>}
         </Button>
         )}

@@ -49,7 +49,7 @@ test.describe("F06 billing", () => {
     expect(sql(`select topup_credits from credit_accounts where user_id = :'p1'`, [uid])).toBe("0");
   });
 
-  test("F06-N2 Stripe unreachable: friendly error, no 5xx", async ({ page }) => {
+  test("F06-N2 Stripe unreachable: friendly error, no 5xx", async ({ page, user }) => {
     await page.goto("/app/settings");
     await page.getByRole("button", { name: /Creator · \$19\/month/ }).click();
     await expect(page.getByRole("alert")).toContainText(/Billing|Nothing was charged/);

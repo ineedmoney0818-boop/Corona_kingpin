@@ -84,7 +84,7 @@ export async function credits(page: Page) {
 }
 export async function makeReel(page: Page, prompt: string) {
   await page.getByLabel("What do you want to make?").fill(prompt);
-  await page.getByRole("button", { name: /Make reel, uses 4 credits/ }).click();
+  await page.getByRole("button", { name: /Make reel 4 credits/ }).click();
   await page.waitForURL("**/app/chats/**", { timeout: 60_000 });
 }
 export async function a11y(page: Page, label: string) {

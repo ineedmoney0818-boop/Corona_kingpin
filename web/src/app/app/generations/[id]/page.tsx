@@ -4,6 +4,7 @@ import Link from "next/link";
 import { RenderCard } from "@/components/app/RenderCard";
 import { ReRender } from "@/components/app/ReRender";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { LocalDate } from "@/components/ui/LocalDate";
 import { requireUser } from "@/lib/auth";
 import { getGeneration, listRenders, NotFound } from "@/lib/data";
 
@@ -21,7 +22,7 @@ async function View({ params }: { params: Promise<{ id: string }> }) {
       {(!latest || latest.status === "failed" || latest.planVersion < gen.planVersion) && <div className="mt-4"><ReRender generationId={gen.id} reason={latest?.status === "failed" ? "retry" : "edits"} /></div>}
       {renders.length > 1 && (
         <details className="mt-6 text-sm"><summary className="cursor-pointer font-semibold">Render history ({renders.length})</summary>
-          <ul className="mt-2 space-y-1 text-text-muted">{renders.map((r) => <li key={r.id}>{new Date(r.createdAt).toLocaleString()} · v{r.planVersion} · {r.status}{r.status === "failed" ? ` · ${r.creditsQuoted} credits refunded` : ` · ${r.creditsQuoted} credits`}</li>)}</ul>
+          <ul className="mt-2 space-y-1 text-text-muted">{renders.map((r) => <li key={r.id}><LocalDate iso={r.createdAt} style="datetime" /> · v{r.planVersion} · {r.status}{r.status === "failed" ? ` · ${r.creditsQuoted} credits refunded` : ` · ${r.creditsQuoted} credits`}</li>)}</ul>
         </details>
       )}
     </>
