@@ -7,7 +7,7 @@ test.describe("F03 make a carousel from photos", () => {
     await page.getByLabel("What do you want to make?").fill("Desk setup tour");
     await page.getByRole("button", { name: /Make carousel 3 credits/ }).click();
     await page.waitForURL("**/app/chats/**");
-    const region = page.getByRole("region", { name: "Your carousel" });
+    const region = page.getByRole("region", { name: "Your carousel" }).filter({ visible: true });
     await expect(region).toBeVisible({ timeout: 180_000 });
     await expect(region.getByText("Slide 1 of 2")).toBeVisible();
     await region.getByRole("button", { name: "Next slide" }).click();

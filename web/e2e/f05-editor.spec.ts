@@ -4,8 +4,8 @@ import type { Page } from "@playwright/test";
 async function openEditor(page: Page) { // caller must already be signed in (user fixture)
   await attach(page, ["photo.jpg", "desk.png"]);
   await makeReel(page, "Edit me later");
-  await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
-  await page.getByRole("link", { name: "Edit" }).click();
+  await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
+  await page.getByRole("link", { name: "Edit", exact: true }).filter({ visible: true }).click();
   await page.waitForURL("**/edit");
   await expect(page.getByLabel("Text")).toBeVisible();
 }
@@ -23,7 +23,7 @@ test.describe("F05 tweak a generated reel", () => {
     await page.getByRole("link", { name: /Render/ }).click();
     await page.getByRole("button", { name: /Render my edits 1 credit/ }).click();
     await expect(page.getByText("Render history (2)")).toBeVisible({ timeout: 180_000 });
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
     expect(await credits(page)).toBe(5);
   });
 

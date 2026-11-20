@@ -9,10 +9,10 @@ test.describe("F02 make a reel from my clips", () => {
     await attach(page, ["clip.mp4", "photo.jpg"]);
     await expect(page.getByRole("button", { name: /Make reel 4 credits/ })).toBeDisabled(); // no prompt yet
     await makeReel(page, "3 things I do before 7am");
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
     expect(await credits(page)).toBe(6);
     await a11y(page, "chat with finished reel");
-    const [dl] = await Promise.all([page.waitForEvent("download"), page.getByRole("link", { name: "Download" }).click()]);
+    const [dl] = await Promise.all([page.waitForEvent("download"), page.getByRole("link", { name: "Download" }).filter({ visible: true }).click()]);
     const file = await dl.path();
     const info = execFileSync("ffprobe", ["-v", "error", "-show_entries", "stream=codec_name", "-of", "csv=p=0", file!]).toString();
     expect(info).toContain("h264");
@@ -28,7 +28,7 @@ test.describe("F02 make a reel from my clips", () => {
   test("F02-E2 very long prompt with emoji", async ({ page, user }) => {
     const prompt = ("Morning ritual ☕️ with Zoë — " + "lorem ipsum ".repeat(200)).slice(0, 2000);
     await makeReel(page, prompt);
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
     const title = await page.getByRole("heading", { level: 1 }).textContent();
     expect(title!.length).toBeLessThanOrEqual(60);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1440);
@@ -38,7 +38,7 @@ test.describe("F02 make a reel from my clips", () => {
     await page.getByLabel("What do you want to make?").fill("double click test");
     await page.getByRole("button", { name: /Make reel 4 credits/ }).dblclick();
     await page.waitForURL("**/app/chats/**");
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
     expect(rendersFor(user.email)).toBe("1");
     expect(await credits(page)).toBe(6);
   });
@@ -61,7 +61,7 @@ test.describe("F02 make a reel from my clips", () => {
     await attach(page, ["clip.mp4"]);
     await makeReel(page, "refresh test");
     await page.reload();
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
   });
 
   test("F02-E6 back button right after submit makes no duplicate", async ({ page, user }) => {
@@ -69,7 +69,7 @@ test.describe("F02 make a reel from my clips", () => {
     await page.goBack();
     await page.waitForURL("**/app");
     await page.goForward();
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
     expect(rendersFor(user.email)).toBe("1");
   });
 
@@ -84,19 +84,22 @@ test.describe("F02 make a reel from my clips", () => {
   test("F02-E8 slow network: button locks while starting", async ({ page, user }) => {
     await page.route("**/api/generations", async (route) => { await new Promise((r) => setTimeout(r, 2500)); await route.continue(); });
     await page.getByLabel("What do you want to make?").fill("slow network");
-    await page.getByRole("button", { name: /Make reel 4 credits/ }).click();
-    await expect(page.getByRole("button", { name: /Make reel/ })).toBeDisabled();
-    await expect(page.getByRole("button", { name: /Make reel/ })).toContainText("Starting…");
+    // Locate the submit button by its form, not its name: the name changes to "Starting…".
+    const submit = page.getByRole("form", { name: "Message Reelplain" }).locator("button[type=submit]");
+    await submit.click();
+    await expect(submit).toContainText("Starting…");
+    await expect(submit).toBeDisabled();
+    await expect(submit).toHaveAttribute("aria-busy", "true");
     await page.waitForURL("**/app/chats/**");
   });
 
-  test("F02-E9 a second user cannot see any of it", async ({ page, newUser }) => {
+  test("F02-E9 a second user cannot see any of it", async ({ page, user, newUser }) => {
     await attach(page, ["photo.jpg"]);
     await makeReel(page, "private reel");
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
     const chatId = page.url().split("/").pop()!;
-    const renderId = await page.getByRole("link", { name: "Download" }).getAttribute("href").then((h) => h!.split("/")[3]);
-    const fileKey = await page.getByLabel("Your reel").getAttribute("src").then((s) => s!.replace("/api/files/", ""));
+    const renderId = await page.getByRole("link", { name: "Download" }).filter({ visible: true }).getAttribute("href").then((h) => h!.split("/")[3]);
+    const fileKey = await page.getByLabel("Your reel").filter({ visible: true }).getAttribute("src").then((s) => s!.replace("/api/files/", ""));
     const eve = await newUser("Eve");
     const statuses = await eve.page.evaluate(async ([r, f]) => [
       (await fetch(`/api/renders/${r}`)).status, (await fetch(`/api/renders/${r}/download`)).status, (await fetch(`/api/files/${f}`)).status,

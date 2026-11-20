@@ -23,10 +23,20 @@ function guard(page: Page, problems: string[]) {
   page.on("console", (m) => {
     if (m.type() !== "error") return;
     if (/Failed to load resource: the server responded with a status of 4\d\d/.test(m.text())) return;
+    if (/net::ERR_INTERNET_DISCONNECTED/.test(m.text())) return; // expected in offline tests
     problems.push(`console: ${m.text()}`);
   });
   page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
   page.on("response", (r) => { if (r.status() >= 500) problems.push(`${r.status()} on ${r.request().method()} ${r.url()}`); });
+}
+
+/** For a test that expects one upstream outage: drop that 5xx (and its console log) from the guard. */
+export function expectOutage(problems: string[], urlPart: string, status: number) {
+  const before = problems.length;
+  for (let i = problems.length - 1; i >= 0; i--) {
+    if ((problems[i].startsWith(`${status} `) && problems[i].includes(urlPart)) || problems[i].includes(`status of ${status}`)) problems.splice(i, 1);
+  }
+  expect(before - problems.length, `expected a ${status} on ${urlPart}`).toBeGreaterThan(0);
 }
 
 type Fixtures = { problems: string[]; user: { email: string; page: Page }; newUser: (name?: string) => Promise<{ email: string; page: Page; context: BrowserContext }> };
@@ -87,6 +97,7 @@ export async function makeReel(page: Page, prompt: string) {
   await page.getByRole("button", { name: /Make reel 4 credits/ }).click();
   await page.waitForURL("**/app/chats/**", { timeout: 60_000 });
 }
+/** Next.js 16 keeps the previous page mounted but hidden (instant back). Tests match visible elements only. */
 export async function a11y(page: Page, label: string) {
   // axe ships its own playwright-core typings; the runtime Page is compatible.
   const r = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"] }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();

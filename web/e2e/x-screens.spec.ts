@@ -17,8 +17,8 @@ test.describe("All screens", () => {
     await page.goto("/app");
     await attach(page, ["photo.jpg"]);
     await makeReel(page, "screens");
-    await expect(page.getByLabel("Your reel")).toBeVisible({ timeout: 180_000 });
-    await page.getByRole("link", { name: "Open" }).click();
+    await expect(page.getByLabel("Your reel").filter({ visible: true })).toBeVisible({ timeout: 180_000 });
+    await page.getByRole("link", { name: "Open" }).filter({ visible: true }).click();
     await a11y(page, "generation");
     await page.goto("/app/library");
     await a11y(page, "library (filled)");

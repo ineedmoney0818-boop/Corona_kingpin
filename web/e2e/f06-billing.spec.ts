@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { test, expect, sql, userId } from "./fixtures";
+import { test, expect, sql, userId, expectOutage } from "./fixtures";
 
 // Webhook side of billing, with events signed by Stripe's own test helper (no Stripe account needed).
 // Checkout with real test cards and the live portal are manual (test-plan F06-M*).
@@ -49,9 +49,16 @@ test.describe("F06 billing", () => {
     expect(sql(`select topup_credits from credit_accounts where user_id = :'p1'`, [uid])).toBe("0");
   });
 
-  test("F06-N2 Stripe unreachable: friendly error, no 5xx", async ({ page, user }) => {
+  test("F06-N2 Stripe unreachable: clear billing message, 503 not 500", async ({ page, user, problems }) => {
     await page.goto("/app/settings");
-    await page.getByRole("button", { name: /Creator · \$19\/month/ }).click();
-    await expect(page.getByRole("alert")).toContainText(/Billing|Nothing was charged/);
+    const [res] = await Promise.all([
+      page.waitForResponse("**/api/billing/checkout"),
+      page.getByRole("button", { name: /Creator · \$19\/month/ }).click(),
+    ]);
+    expect(res.status()).toBe(503);
+    expect((await res.json()).error.code).toBe("billing_unavailable");
+    await expect(page.getByText("Billing is unavailable right now. Nothing was charged.", { exact: false })).toBeVisible();
+    await expect(page).toHaveURL(/\/app\/settings/);
+    expectOutage(problems, "/api/billing/checkout", 503); // the one expected upstream outage
   });
 });

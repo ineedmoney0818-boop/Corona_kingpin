@@ -1,5 +1,6 @@
 import "server-only";
 import { currentUser } from "@/lib/auth";
+import Stripe from "stripe";
 import { InsufficientCredits, NotFound, type User } from "@/lib/data";
 
 export const json = (body: unknown, status = 200) => Response.json(body, { status });
@@ -15,6 +16,10 @@ export function withUser<A extends unknown[]>(fn: (user: User, ...args: A) => Pr
     } catch (e) {
       if (e instanceof InsufficientCredits) return err(402, "insufficient_credits", `You have ${e.available}, this needs ${e.needed}.`, { needed: e.needed, available: e.available });
       if (e instanceof NotFound) return err(404, "not_found", "We couldn't find that.");
+      if (e instanceof Stripe.errors.StripeError) {
+        console.error(JSON.stringify({ evt: "stripe_error", type: e.type, code: e.code ?? null }));
+        return err(503, "billing_unavailable", "Billing is unavailable right now. Nothing was charged. Try again in a few minutes.");
+      }
       const m = (e as Error).message;
       if (m === "quote_expired") return err(409, "quote_expired", "That price is out of date. Here's a fresh one.");
       if (m === "version_conflict") return err(409, "version_conflict", "This was changed somewhere else. Reload to get the latest.");

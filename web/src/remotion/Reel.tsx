@@ -35,7 +35,8 @@ function Background({ scene, media }: { scene: Plan["scenes"][number]; media: Me
   }
   const src = m.isStatic ? staticFile(m.src) : m.src;
   const fill: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
-  if (m.kind === "image") return <Img src={src} style={fill} />;
+  // Decorative background: the text layer carries the meaning, so screen readers skip it.
+  if (m.kind === "image") return <Img src={src} alt="" style={fill} />;
   // OffthreadVideo is frame-accurate for server renders; <Video> plays in the browser preview.
   return getRemotionEnvironment().isRendering ? <OffthreadVideo src={src} style={fill} muted /> : <Video src={src} style={fill} muted />;
 }
