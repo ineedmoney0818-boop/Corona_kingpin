@@ -1,0 +1,29 @@
+{
+  "avoid": [
+    "Limesnap",
+    "LimeSnap",
+    "Lime Snap",
+    "CapCut",
+    "OpusClip",
+    "Opus Clip",
+    "Submagic",
+    "Predis",
+    "Vizard",
+    "Instagram",
+    "TikTok",
+    "YouTube"
+  ],
+  "app_store": {
+    "name": "Reelplain: Reels & Carousels",
+    "subtitle": "Clip, caption, know the cost",
+    "promotional_text": "Every action shows its cost before you tap it. Failed renders give your credits back. Cancel in one tap.",
+    "description": "Reelplain turns your videos and photos into reels and carousels, and shows you what each step costs before it runs.\n\nHow it works:\n- Drop in a video or a few photos\n- Reelplain drafts clips or a carousel with captions\n- Change anything on your phone, then export or post\n\nWhat's different:\n- The cost is on the button, before you tap\n- If a render fails, your credits come back automatically\n- Anything you make can be exported, even on the Try plan (with a small watermark)\n- Cancel in one tap. You keep your plan until the period ends\n- Full editing on your phone: trim, caption text, caption position\n- Your footage stays yours: no AI-generated replacements unless you ask\n- Save caption styles you like, or turn captions off\n\nPlans:\nTry: 10 credits a month, watermark.\nCreator: 120 credits a month, no watermark.\nStudio: 400 credits a month, 3 brands, bulk export.\nUnused credits roll over for one month. We email you before every renewal.\n\nPayment is charged to your Apple ID at confirmation. Subscriptions renew automatically unless cancelled at least 24 hours before the end of the period. Manage or cancel in your App Store account settings.",
+    "keywords": "shorts,vertical,clips,captions,carousel,subtitles,video,editor,social,repurpose,creator,maker,ai",
+    "whats_new": "First release."
+  },
+  "google_play": {
+    "title": "Reelplain: Reels & Carousels",
+    "short_description": "Turn videos and photos into reels. See the cost of every step before it runs.",
+    "full_description": "Reelplain turns your videos and photos into reels and carousels, and shows you what each step costs before it runs.\n\nHow it works:\n- Drop in a video or a few photos\n- Reelplain drafts clips or a carousel with captions\n- Change anything on your phone, then export or post\n\nWhat's different:\n- The cost is on the button, before you tap\n- If a render fails, your credits come back automatically\n- Anything you make can be exported, even on the Try plan (with a small watermark)\n- Cancel in one tap. You keep your plan until the period ends\n- Full editing on your phone: trim, caption text, caption position\n- Your footage stays yours: no AI-generated replacements unless you ask\n\nPlans:\nTry: 10 credits a month, watermark.\nCreator: 120 credits a month, no watermark.\nStudio: 400 credits a month, 3 brands, bulk export.\nUnused credits roll over for one month. We email you before every renewal."
+  }
+}

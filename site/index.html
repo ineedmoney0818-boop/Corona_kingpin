@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reelplain: reels and carousels, price first</title>
+<meta name="description" content="Reelplain turns your videos and photos into reels and carousels. Every action shows its cost before it runs. Failed renders are free. Cancel in one tap.">
+<style>
+:root{--bg:#ffffff;--surface:#faf7f4;--border:#e8e1db;--border-input:#857a72;--text:#1c1714;--text-muted:#655a52;--accent:#c2410c;--on-accent:#ffffff;--danger:#b3123a;--success:#16794a;
+--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--r-md:10px;--r-lg:16px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/24px var(--sans)}
+a{color:var(--accent)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header.top{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.btn{display:inline-block;background:var(--accent);color:var(--on-accent);font-weight:600;padding:12px 20px;border-radius:var(--r-md);text-decoration:none;border:0}
+.btn:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.hero{padding:56px 0 40px}
+h1{font-size:40px;line-height:44px;margin:0 0 16px;letter-spacing:-.02em;max-width:720px}
+h2{font-size:28px;line-height:34px;margin:0 0 24px}
+.lede{font-size:20px;line-height:28px;color:var(--text-muted);max-width:640px;margin:0 0 24px}
+.shot{margin-top:40px;border:1px dashed var(--border-input);border-radius:var(--r-lg);background:var(--surface);padding:48px 16px;text-align:center;color:var(--text-muted)}
+section{padding:48px 0;border-top:1px solid var(--border)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+.card h3{margin:0 0 8px;font-size:18px}
+.card p{margin:0;color:var(--text-muted)}
+ol.steps{padding-left:20px;margin:0}ol.steps li{margin-bottom:12px}
+.price{font-size:36px;font-weight:700;margin:8px 0}
+.price small{font-size:16px;font-weight:400;color:var(--text-muted)}
+.card ul{padding-left:18px;margin:12px 0 0;color:var(--text-muted)}
+.feat{border:2px solid var(--accent)}
+details{border-bottom:1px solid var(--border);padding:16px 0}
+summary{font-weight:600;cursor:pointer}
+details p{color:var(--text-muted);margin:8px 0 0}
+.cta{text-align:center}
+footer{padding:32px 0;color:var(--text-muted);font-size:14px;border-top:1px solid var(--border)}
+@media (max-width:600px){h1{font-size:32px;line-height:38px}.lede{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><a class="logo" href="#">reel<span>plain</span></a><a class="btn" href="#start">Start free</a></header>
+
+<div class="hero">
+<h1>Turn your clips into reels. See the price before you start.</h1>
+<p class="lede">Reelplain cuts, captions and formats your videos and photos into reels and carousels. Every action shows its cost first, failed renders are free, and you cancel in one tap.</p>
+<a class="btn" id="start" href="#waitlist">Start free, no card</a>
+<div class="shot">Product screenshot goes here once the app exists.</div>
+</div>
+
+<section>
+<h2>The problem with most AI video apps</h2>
+<div class="grid">
+<div class="card"><h3>You do the work, then they ask for money</h3><p>An hour of editing, and the export button turns into a paywall.</p></div>
+<div class="card"><h3>Credits disappear on broken renders</h3><p>The app fails, the credits are gone, and you start over.</p></div>
+</div>
+</section>
+
+<section>
+<h2>How it works</h2>
+<ol class="steps">
+<li><strong>Drop in</strong> a video or a few photos.</li>
+<li><strong>Reelplain drafts</strong> clips or a carousel with captions. Each step shows its credit cost before it runs.</li>
+<li><strong>Change anything</strong> on your phone, then export or post.</li>
+</ol>
+</section>
+
+<section>
+<h2>What's different</h2>
+<div class="grid">
+<div class="card"><h3>The price is on the button</h3><p>See what an action costs before you tap it.</p></div>
+<div class="card"><h3>Failed renders are free</h3><p>If it breaks, your credits come back automatically.</p></div>
+<div class="card"><h3>Export is never a trap</h3><p>Everything you make can be exported, even on the free plan, with a small watermark.</p></div>
+<div class="card"><h3>Cancel in one tap</h3><p>You keep your plan and credits until the period ends.</p></div>
+<div class="card"><h3>Full editing on your phone</h3><p>The AI's draft is a starting point. Trim, retype and move captions.</p></div>
+<div class="card"><h3>Your footage stays yours</h3><p>No AI-generated replacements unless you ask for them.</p></div>
+</div>
+</section>
+
+<section>
+<h2>Pricing</h2>
+<div class="grid">
+<div class="card"><h3>Try</h3><div class="price">$0</div><p>See if it works for you.</p><ul><li>10 credits a month</li><li>Export with a small watermark</li><li>No card needed</li></ul></div>
+<div class="card feat"><h3>Creator</h3><div class="price">$19<small> / month</small></div><p>Posting a few times a week.</p><ul><li>120 credits a month</li><li>No watermark</li><li>Unused credits roll over 1 month</li><li>$190 a year (2 months free)</li></ul></div>
+<div class="card"><h3>Studio</h3><div class="price">$49<small> / month</small></div><p>Posting daily, or for clients.</p><ul><li>400 credits a month</li><li>3 brands, bulk export</li><li>Unused credits roll over 1 month</li><li>$490 a year (2 months free)</li></ul></div>
+</div>
+</section>
+
+<section>
+<h2>Questions</h2>
+<details><summary>Do I need a card to try it?</summary><p>No. The free plan is the trial.</p></details>
+<details><summary>What's a credit?</summary><p>One unit of AI work. Every button shows how many it uses before you tap it.</p></details>
+<details><summary>What if a render fails?</summary><p>Your credits come back automatically, and you'll see a note saying so.</p></details>
+<details><summary>Do unused credits expire?</summary><p>They roll over for one month.</p></details>
+<details><summary>How do I cancel?</summary><p>Settings, Plan, Cancel. Or use the link in any renewal email. You keep everything until the period ends.</p></details>
+<details><summary>Will you remind me before you charge me?</summary><p>Yes. 3 days before a monthly renewal, 7 days before an annual one.</p></details>
+<details><summary>Can I bring videos from other apps?</summary><p>Yes. Upload any MP4 or MOV, or photos.</p></details>
+</section>
+
+<section class="cta" id="waitlist">
+<h2>Make your first reel. See what it costs before it costs anything.</h2>
+<a class="btn" href="mailto:hello@reelplain.com?subject=Reelplain%20waitlist">Join the waitlist</a>
+</section>
+
+<footer>© Reelplain. Privacy · Terms · Support</footer>
+</div>
+</body>
+</html>
