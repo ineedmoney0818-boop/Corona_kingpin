@@ -17,7 +17,9 @@ RUN npm ci --no-audit --no-fund
 RUN npx remotion browser ensure
 
 COPY . .
+# Bundle the video template once here; renders reuse it instead of running webpack (~1.3 GB) per job.
+RUN node scripts/prebundle.mjs /app/.remotion-bundle
 
-ENV NODE_ENV=production RENDER_IN_PROCESS=0 RENDER_SCALE=1 REELPLAIN_ROOT=/app
+ENV NODE_ENV=production RENDER_IN_PROCESS=0 RENDER_SCALE=1 REELPLAIN_ROOT=/app REMOTION_BUNDLE_DIR=/app/.remotion-bundle
 # Run tsx directly (not via npm) so SIGTERM reaches the worker and it finishes the current render before exiting.
 CMD ["node_modules/.bin/tsx", "--tsconfig", "tsconfig.json", "src/worker/main.ts"]
