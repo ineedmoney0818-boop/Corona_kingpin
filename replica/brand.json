@@ -1,0 +1,6 @@
+{
+  "name": "Reelplain",
+  "avoid": ["Limesnap", "LimeSnap", "Lime Snap"],
+  "domains": ["limesnap.com"],
+  "colors": ["#85b586", "#9CAF88"]
+}
