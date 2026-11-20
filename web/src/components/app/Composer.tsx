@@ -12,6 +12,27 @@ type Attachment = { localId: string; name: string; status: "uploading" | "ready"
 type Kind = "reel" | "carousel";
 const dur = (ms: number | null) => (ms ? `${Math.floor(ms / 60000)}:${String(Math.round(ms / 1000) % 60).padStart(2, "0")}` : "");
 
+// Supabase mode: sign, upload straight to storage, then confirm (large videos never pass through the web server).
+// Fake mode: one multipart request to the app.
+async function uploadOne(file: File): Promise<{ r: Response | null; j: { asset?: Asset; error?: { message: string } } | null }> {
+  const parse = async (res: Response | null) => (res ? await res.json().catch(() => null) : null);
+  const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supaUrl) {
+    const body = new FormData(); body.append("file", file);
+    const r = await fetch("/api/uploads", { method: "POST", body }).catch(() => null);
+    return { r, j: await parse(r) };
+  }
+  const sign = await fetch("/api/uploads/sign", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: file.name, type: file.type, size: file.size }) }).catch(() => null);
+  const sj = await parse(sign);
+  if (!sign?.ok) return { r: sign, j: sj };
+  const { createClient } = await import("@supabase/supabase-js");
+  const sb = createClient(supaUrl, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);
+  const up = await sb.storage.from("media").uploadToSignedUrl(sj.path, sj.token, file, { contentType: file.type });
+  if (up.error) return { r: null, j: { error: { message: "Upload failed. Check your connection and try again." } } };
+  const done = await fetch("/api/uploads/complete", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key: sj.key, name: file.name }) }).catch(() => null);
+  return { r: done, j: await parse(done) };
+}
+
 export function Composer({ chatId }: { chatId: string | null }) {
   const router = useRouter();
   const [text, setText] = useState("");
@@ -40,11 +61,9 @@ export function Composer({ chatId }: { chatId: string | null }) {
     for (const file of Array.from(list)) {
       const localId = crypto.randomUUID();
       setFiles((f) => [...f, { localId, name: file.name, status: "uploading" }]);
-      const body = new FormData(); body.append("file", file);
-      const r = await fetch("/api/uploads", { method: "POST", body }).catch(() => null);
-      const j = r ? await r.json().catch(() => null) : null;
+      const { r, j } = await uploadOne(file);
       setFiles((f) => f.map((a) => a.localId !== localId ? a
-        : r?.ok ? { ...a, status: "ready", asset: j.asset } : { ...a, status: "failed", error: j?.error?.message ?? "Upload failed. Check your connection and try again." }));
+        : r?.ok && j?.asset ? { ...a, status: "ready", asset: j.asset } : { ...a, status: "failed", error: j?.error?.message ?? "Upload failed. Check your connection and try again." }));
     }
     if (fileInput.current) fileInput.current.value = "";
   }

@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { getAccount, listLedger } from "@/lib/data";
-import { Notice } from "@/components/ui/Notice";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ButtonLink } from "@/components/ui/Button";
+import { BillingButtons } from "@/components/settings/BillingButtons";
+import { DangerZone } from "@/components/settings/DangerZone";
+import { stripeEnabled } from "@/lib/billing/stripe";
 
 export const metadata: Metadata = { title: "Settings" };
 const LABEL: Record<string, string> = { grant: "Monthly credits", rollover_trim: "Rollover limit", topup: "Credit pack", spend: "Used", refund: "Refunded", adjust: "Adjustment" };
@@ -25,9 +27,9 @@ async function Content() {
       </section>
       <section aria-labelledby="plan" className="rounded-lg border border-border bg-surface p-4">
         <h2 id="plan" className="text-lg font-bold">Plan</h2>
-        <p className="mt-2 text-sm">You&apos;re on the free plan: 10 credits a month and a small watermark on exports.</p>
-        <Notice className="mt-3">Paid plans and one-tap cancel switch on when billing is connected. Nothing is charged until then.</Notice>
-        <ButtonLink href="/pricing" variant="secondary" className="mt-3">See plans</ButtonLink>
+        <p className="mt-2 text-sm">{user.plan === "try" ? "You're on the free plan: 10 credits a month and a small watermark on exports." : `You're on ${user.plan === "creator" ? "Creator" : "Studio"}: ${a.monthlyGrant} credits a month, no watermark.`}</p>
+        <BillingButtons plan={user.plan} enabled={stripeEnabled()} />
+        {user.plan === "try" && <ButtonLink href="/pricing" variant="ghost" size="sm" className="mt-2">Compare plans</ButtonLink>}
       </section>
       <section id="credits" aria-labelledby="cr" className="rounded-lg border border-border bg-surface p-4">
         <h2 id="cr" className="text-lg font-bold">Credits</h2>
@@ -50,6 +52,10 @@ async function Content() {
             })}
           </tbody>
         </table>
+      </section>
+      <section aria-labelledby="acct-danger" className="rounded-lg border border-border bg-surface p-4">
+        <h2 id="acct-danger" className="text-lg font-bold">Sign-in and account</h2>
+        <div className="mt-3"><DangerZone email={user.email} /></div>
       </section>
     </>
   );

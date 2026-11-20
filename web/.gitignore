@@ -42,3 +42,4 @@ next-env.d.ts
 
 # local fake-mode data (db, uploads, renders)
 /.data
+!.env.example

@@ -1,0 +1,10 @@
+<!doctype html>
+<html><body style="margin:0;padding:24px;background:#faf7f4;font-family:Inter,system-ui,sans-serif;color:#1c1714">
+  <div style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e8e1db;border-radius:16px;padding:28px">
+    <p style="font-weight:800;font-size:20px;margin:0 0 20px">reel<span style="color:#c2410c">plain</span></p>
+    <h1 style="font-size:20px;margin:0 0 8px">Reset your password</h1>
+    <p style="font-size:15px;line-height:22px;color:#655a52;margin:0 0 20px">Someone (hopefully you) asked to reset the password for this account. The link works once and expires in an hour.</p>
+    <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery" style="display:inline-block;background:#c2410c;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:10px">Choose a new password</a>
+    <p style="font-size:13px;line-height:20px;color:#655a52;margin:20px 0 0">If you didn&rsquo;t ask for this, ignore this email. Nothing changes.</p>
+  </div>
+</body></html>

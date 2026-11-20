@@ -1,4 +1,3 @@
-import "server-only";
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -290,4 +289,51 @@ export async function renderByIdempotencyKey(userId: string, key: string) {
 export async function assertCanAfford(userId: string, credits: number) {
   const a = await getAccount(userId);
   if (a.planCredits + a.topupCredits < credits) throw new InsufficientCredits(credits, a.planCredits + a.topupCredits);
+}
+
+// ---------------------------------------------------------------- parity with supabase-store.ts
+export async function getProfile(userId: string, email: string): Promise<User> {
+  const u = db().users.find((x) => x.id === userId);
+  if (!u) throw new NotFound("profile");
+  return { ...u, email };
+}
+export async function addTopup(userId: string, amount: number, ref: string) {
+  const d = db();
+  if (d.ledger.some((l) => l.ref === ref && l.kind === "topup")) return;
+  const a = d.accounts.find((x) => x.userId === userId)!;
+  a.topupCredits += amount;
+  ledger({ userId, kind: "topup", planDelta: 0, topupDelta: amount, renderId: null, ref, note: null });
+  save();
+}
+export async function failRenderSystem(id: string, code: string, detail: string) {
+  const r = db().renders.find((x) => x.id === id);
+  if (r && (r.status === "queued" || r.status === "rendering")) {
+    Object.assign(r, { status: "failed", errorCode: code, errorDetail: detail.slice(0, 500), finishedAt: now() });
+  }
+  await refundRender(id, `refund: ${code}`);
+}
+export async function claimNextRender(): Promise<Render | null> {
+  const r = db().renders.filter((x) => x.status === "queued").sort((a, b) => a.createdAt.localeCompare(b.createdAt))[0];
+  if (!r) return null;
+  Object.assign(r, { status: "rendering", startedAt: now(), progress: 0 }); save();
+  return { ...r };
+}
+export async function reapStuckRenders(olderThanMinutes: number): Promise<number> {
+  const cutoff = Date.now() - olderThanMinutes * 60_000;
+  const stuck = db().renders.filter((r) => (r.status === "rendering" && new Date(r.startedAt ?? r.createdAt).getTime() < cutoff) || (r.status === "queued" && new Date(r.createdAt).getTime() < cutoff - 2 * olderThanMinutes * 60_000));
+  for (const r of stuck) await failRenderSystem(r.id, "abandoned", "Stopped without finishing.");
+  return stuck.length;
+}
+export async function logJobFailure(job: string, ref: string | null, error: string) { console.error(JSON.stringify({ evt: "job_failure", job, ref, error })); }
+const hits = new Map<string, number>();
+export async function hitRateLimit(key: string, windowSeconds: number, max: number): Promise<boolean> {
+  const k = `${key}:${Math.floor(Date.now() / 1000 / windowSeconds)}`;
+  const c = (hits.get(k) ?? 0) + 1; hits.set(k, c);
+  return c <= max;
+}
+export async function discardMessage(userId: string, messageId: string, chatId: string | null) {
+  const d = db();
+  d.messages = d.messages.filter((m) => !(m.id === messageId && m.userId === userId));
+  if (chatId) d.chats = d.chats.filter((c) => !(c.id === chatId && c.userId === userId));
+  save();
 }

@@ -1,14 +1,14 @@
 feature,area,priority,original,clone,notes
-Sign up / sign in with Google,onboarding,must,yes,partial,"Button shown, disabled until Supabase Auth (replica-backend)"
-Sign up / sign in with email + password,onboarding,should,yes,yes,"Fake-mode auth: scrypt hashes, httpOnly session"
+Sign up / sign in with Google,onboarding,must,yes,partial,"Button shown, disabled until Supabase Auth (replica-backend) | Supabase OAuth flow built (/auth/callback); untested until your Google OAuth client exists"
+Sign up / sign in with email + password,onboarding,should,yes,yes,"Fake-mode auth: scrypt hashes, httpOnly session | Supabase Auth: verification email, password reset, sign out everywhere; tested on local Supabase"
 Chat workspace: prompt the AI to generate content,chat,must,yes,yes,S06; core loop | S06; prompt + attachments + reel/carousel
 Chat history list in sidebar; auto-titled chats,chat,should,yes,yes,S06 | Titled from the first line of the prompt
 Attach videos/images to a prompt,chat,must,yes,yes,S06 composer | Type and size checked before storing; ffprobe metadata
 "AI idea generation (hooks, post ideas) in chat",chat,should,yes,no,S09; Limesnap meters as chat credits | Needs the Claude planner (replica-backend)
 Message feedback: copy / thumbs up / thumbs down,chat,could,yes,yes,S06
-Generate reel: scene-based 9:16 video with text overlays from assets + prompt,generation,must,yes,partial,"S08; hard part #1/#2 | Real Remotion render to mp4; planner is a deterministic stand-in, no AI yet"
-Generate carousel: multi-slide post with text overlays,generation,should,yes,partial,S07 | Real PNG slides; same stand-in planner
-AI-written post caption with each generation,generation,must,yes,partial,S07/S08 | Template caption; AI caption comes with the Claude planner
+Generate reel: scene-based 9:16 video with text overlays from assets + prompt,generation,must,yes,partial,"S08; hard part #1/#2 | Claude planner built (structured outputs, owner-only asset enum); not run live yet (no API key in this session)"
+Generate carousel: multi-slide post with text overlays,generation,should,yes,partial,"S07 | Same: Claude planner built, not run live"
+AI-written post caption with each generation,generation,must,yes,partial,S07/S08 | Claude planner writes caption + hashtags; not run live yet
 Inline preview of reel (player) and carousel (swipe),generation,must,yes,yes,S07/S08 | Video player; carousel with buttons + arrow labels
 Download reel mp4 / carousel images,export,must,yes,yes,Per-slide download for carousels
 Scene editor: scene list / add text / add image / duration / background,editor,should,yes,partial,"S10; Reelplain fix #4 makes this mobile-friendly | Text, position, style, duration, reorder, delete, caption; no add-scene/add-image/background swap yet"
@@ -17,16 +17,16 @@ Carousel slide editor,editor,could,guess,partial,S11 not seen | Same editor as r
 Projects to group uploads,library,should,yes,partial,S12 | Create + list + all uploads; assigning uploads to a project not built
 Generated posts library,library,should,yes,yes,S13 | S13 with status per item
 Stock image/video picker (Pexels/Pixabay official APIs),library,could,yes,no,S15; their library is licensed - use own provider | Needs a Pexels key
-Settings: profile and subscription management,account,must,yes,partial,S14 | Profile + full credit history; subscription needs Stripe
-Monthly/yearly subscription plans with credits,billing,must,yes,no,see launch/pricing.md for Reelplain tiers | Stripe in replica-backend
+Settings: profile and subscription management,account,must,yes,yes,"S14 | Plans, credit packs, portal, sign out everywhere, delete account"
+Monthly/yearly subscription plans with credits,billing,must,yes,partial,see launch/pricing.md for Reelplain tiers | Checkout + webhooks built; webhook logic tested with signed events; live Stripe untested
 Free tier (no card),billing,must,no,yes,"Reelplain addition; Limesnap has none | 10 credits on signup, watermark on exports"
 Brand voice from user's own Instagram via official Instagram Login API,onboarding,could,partial,no,replaces handle scraping
 Instagram profile scraping by handle (incl. other users),onboarding,skip,yes,no,SKIP: scraping is against Meta terms + legal risk; see recon Out of scope
 Limesnap's marketing-trained prompts/model,generation,skip,yes,no,SKIP: theirs; write own prompts
 Limesnap's public stock asset library,library,skip,yes,no,SKIP: licensed content; use Pexels/Pixabay
 Upfront pricing; no paywall on export of finished work (watermarked free export),billing,must,no,yes,fixes.md #1 - price/paywall 124 reviews | Cost on every button from a server quote; free exports carry watermark
-Auto-refund credits on failed render or rejected regeneration; show credit cost before action,billing,must,no,partial,"fixes.md #2 - credits 74 reviews | Failed renders refund automatically (tested: error, missing file, orphaned); 'rejected regeneration' refund not built"
-One-tap cancel in app and web; keep paid period and credits after cancel,billing,must,no,no,fixes.md #3 - billing 63 reviews | Needs Stripe portal
+Auto-refund credits on failed render or rejected regeneration; show credit cost before action,billing,must,no,partial,"fixes.md #2 - credits 74 reviews | Refund on every failure path, in SQL, tested (error, missing file, stuck/reaper); 'rejected regeneration' refund not built"
+One-tap cancel in app and web; keep paid period and credits after cancel,billing,must,no,partial,fixes.md #3 - billing 63 reviews | Stripe Customer Portal; cancel-at-period-end handling tested via webhook; portal untested live
 Full manual edit on mobile after AI draft (trim/caption text/position/delete),editor,must,no,partial,fixes.md #4 - manual control ~25 + OpusClip mobile requests | Editor works at 390px; no clip trimming
 Autosave drafts and resumable uploads,editor,should,no,no,fixes.md #5 - crashes 66 + uploads 16 | Explicit free Save; single-request uploads
 Caption presets: save favourite / toggle off / single-word / movable,editor,should,no,no,fixes.md #6 - thin | Text position/style per scene only

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { addMessage, assertCanAfford, createChat, createGenerationAndRender, getAssets, getChat, getGeneration, getQuote, renderByIdempotencyKey } from "@/lib/data";
-import { fakePlan } from "@/lib/plan/fake-planner";
+import { addMessage, assertCanAfford, discardMessage, createChat, createGenerationAndRender, getAssets, getChat, getGeneration, getQuote, renderByIdempotencyKey } from "@/lib/data";
+import { makePlan, PlannerError } from "@/lib/plan";
 import { enqueueRender } from "@/lib/render/runner";
 import { err, json, withUser } from "@/lib/api/http";
 
@@ -28,19 +28,38 @@ export const POST = withUser(async (user, req: Request) => {
   if (b.kind === "carousel" && assets.some((a) => a.kind === "video")) return err(400, "bad_request", "Carousels use photos. Remove the videos, or make a reel instead.");
 
   await assertCanAfford(user.id, q.credits); // before writing anything
+  if (b.chatId) await getChat(user.id, b.chatId); // ownership before spending tokens
+  // Plan before charging: if the planner fails, nothing is charged and nothing is written.
+  let plan;
+  try {
+    plan = await makePlan(b.prompt, assets, b.kind);
+  } catch (e) {
+    if (e instanceof PlannerError) {
+      const msg = e.code === "refused" ? "I can't make that one. Try describing it differently. Nothing was charged."
+        : "I couldn't plan that just now. Nothing was charged. Try again in a moment.";
+      return err(e.code === "refused" ? 422 : 503, `planner_${e.code}`, msg);
+    }
+    throw e;
+  }
+  await assertCanAfford(user.id, q.credits); // balance may have changed while planning
+  const newChat = !b.chatId;
   const chat = b.chatId ? await getChat(user.id, b.chatId) : await createChat(user.id, b.prompt.split("\n")[0].slice(0, 60));
   const userMsg = await addMessage(user.id, { chatId: chat.id, role: "user", content: b.prompt, attachmentIds: b.attachmentIds, generationId: null });
-  const plan = fakePlan(b.prompt, assets, b.kind);
   const { generation, render, replayed } = await createGenerationAndRender({
     userId: user.id, chatId: chat.id, messageId: userMsg.id, kind: b.kind, plan, quoteId: q.id, idempotencyKey: b.idempotencyKey,
   });
-  if (!replayed) {
+  if (replayed) {
+    // A simultaneous identical request won: drop what this one wrote and answer with the winner's ids.
+    await discardMessage(user.id, userMsg.id, newChat ? chat.id : null);
+    return json({ chatId: generation.chatId, generationId: generation.id, renderId: render.id }, 200);
+  }
+  {
     const n = plan.scenes.length;
     await addMessage(user.id, {
       chatId: chat.id, role: "assistant", attachmentIds: [], generationId: generation.id,
       content: `Here's the plan: ${n} ${b.kind === "reel" ? "scene" : "slide"}${n === 1 ? "" : "s"}, starting with "${plan.hook}". Rendering now.`,
     });
-    enqueueRender(render.id);
+    enqueueRender();
   }
   return json({ chatId: chat.id, generationId: generation.id, renderId: render.id }, replayed ? 200 : 201);
 });
