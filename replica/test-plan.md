@@ -58,4 +58,13 @@ Flows come from `recon.md`. Limesnap's F04 (ideas chat) isn't built in Reelplain
 | X-A1 | all screens | a11y | axe on landing, pricing, sign-in, sign-up, app, chat, generation, editor, library, projects, settings | no WCAG 2.2 AA violations | e2e |
 | X-T1 | dates | edge: time zones | user in Pacific/Auckland reads credit history | dates in the user's zone | e2e |
 
-**Results:** see `bugs.md` and the summary at the end of this run.
+## Results (2026-11-20, commit 2120194, clean database)
+
+- **Automated: 40 of 40 passed** in 3.5 minutes, with zero console errors, zero unexpected 5xx responses, and zero axe violations on the 11 screens scanned.
+- **Blocked:** F04 (ideas chat, not built).
+- **Manual, waiting on your accounts:** F01-M1, F01-M2, F06-M1, F06-M2, F06-M3.
+- **History:**
+  - First run: 24/40. Most failures were test bugs; 2 were real bugs (BUG-001, BUG-002).
+  - Second run: 33/40, which surfaced BUG-003, BUG-004 and BUG-005.
+  - All 5 were fixed test-first, and the full suite was re-run.
+- **How to run:** `npm run db:start` (once), then `npx next build && npx playwright test` from `web/`.
