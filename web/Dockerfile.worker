@@ -12,10 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 COPY package.json package-lock.json ./
-# The optional "ca" secret only exists in builds behind a TLS-inspecting proxy; Railway never sets it.
-RUN --mount=type=secret,id=ca,required=false NODE_EXTRA_CA_CERTS=$([ -f /run/secrets/ca ] && echo /run/secrets/ca) npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 # Download Remotion's pinned Chrome Headless Shell at build time, not on the first job.
-RUN --mount=type=secret,id=ca,required=false NODE_EXTRA_CA_CERTS=$([ -f /run/secrets/ca ] && echo /run/secrets/ca) npx remotion browser ensure
+RUN npx remotion browser ensure
 
 COPY . .
 
