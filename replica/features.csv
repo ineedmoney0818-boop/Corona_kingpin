@@ -1,4 +1,29 @@
 feature,area,priority,original,clone,notes
+Sign up / sign in with Google,onboarding,must,yes,no,
+Sign up / sign in with email + password,onboarding,should,yes,no,
+Chat workspace: prompt the AI to generate content,chat,must,yes,no,S06; core loop
+Chat history list in sidebar; auto-titled chats,chat,should,yes,no,S06
+Attach videos/images to a prompt,chat,must,yes,no,S06 composer
+"AI idea generation (hooks, post ideas) in chat",chat,should,yes,no,S09; Limesnap meters as chat credits
+Message feedback: copy / thumbs up / thumbs down,chat,could,yes,no,S06
+Generate reel: scene-based 9:16 video with text overlays from assets + prompt,generation,must,yes,no,S08; hard part #1/#2
+Generate carousel: multi-slide post with text overlays,generation,should,yes,no,S07
+AI-written post caption with each generation,generation,must,yes,no,S07/S08
+Inline preview of reel (player) and carousel (swipe),generation,must,yes,no,S07/S08
+Download reel mp4 / carousel images,export,must,yes,no,
+Scene editor: scene list / add text / add image / duration / background,editor,should,yes,no,S10; Reelplain fix #4 makes this mobile-friendly
+Global background video for all scenes,editor,could,yes,no,S10
+Carousel slide editor,editor,could,guess,no,S11 not seen
+Projects to group uploads,library,should,yes,no,S12
+Generated posts library,library,should,yes,no,S13
+Stock image/video picker (Pexels/Pixabay official APIs),library,could,yes,no,S15; their library is licensed - use own provider
+Settings: profile and subscription management,account,must,yes,no,S14
+Monthly/yearly subscription plans with credits,billing,must,yes,no,see launch/pricing.md for Reelplain tiers
+Free tier (no card),billing,must,no,no,Reelplain addition; Limesnap has none
+Brand voice from user's own Instagram via official Instagram Login API,onboarding,could,partial,no,replaces handle scraping
+Instagram profile scraping by handle (incl. other users),onboarding,skip,yes,no,SKIP: scraping is against Meta terms + legal risk; see recon Out of scope
+Limesnap's marketing-trained prompts/model,generation,skip,yes,no,SKIP: theirs; write own prompts
+Limesnap's public stock asset library,library,skip,yes,no,SKIP: licensed content; use Pexels/Pixabay
 Upfront pricing; no paywall on export of finished work (watermarked free export),billing,must,no,no,fixes.md #1 - price/paywall 124 reviews
 Auto-refund credits on failed render or rejected regeneration; show credit cost before action,billing,must,no,no,fixes.md #2 - credits 74 reviews
 One-tap cancel in app and web; keep paid period and credits after cancel,billing,must,no,no,fixes.md #3 - billing 63 reviews
