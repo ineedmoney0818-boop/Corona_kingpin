@@ -1,15 +1,15 @@
 # Parity: Reelplain vs Limesnap
 
-**Date:** 2026-11-20. **Build:** 4802e9a. **Tools:** `parity.py` and `imgdiff.py` (replica-diff).
+**Date:** 2026-11-20. **Build:** 8521d13 (updated after building the ideas chat and the full editor). **Tools:** `parity.py` and `imgdiff.py` (replica-diff).
 
 ## Verdict: not shippable yet
 
 | | |
 | --- | --- |
-| **Feature parity** | **68.5 / 100** |
+| **Feature parity** | **73.9 / 100** (was 68.5 before ideas chat + editor) |
 | Must-haves | **5 of 9 done**; the other 4 are built but unverified (see below) |
 | Layout (public screens only) | 24.6 / 100, different by design |
-| Combined score from the tool | 59.7 / 100 |
+| Combined score from the tool | 59.7 / 100 at 68.5 features (layout unchanged) |
 | Open bugs | S1 0 · S2 0 · S3 0 · S4 0 (`bugs.md`) |
 
 **Why it's not shippable:** the 4 must-haves at "partial" aren't missing code. Each is written and tested as far as possible without your accounts:
@@ -37,12 +37,12 @@ Plus a free plan, where Limesnap has none. One-tap cancel uses the Stripe portal
 
 | area | score | features |
 | --- | --- | --- |
-| editor | 37.5 | 3 |
+| editor | 75.0 | 3 |
 | billing | 50.0 | 1 |
 | onboarding | 58.3 | 3 |
 | library | 60.0 | 3 |
 | generation | 63.6 | 4 |
-| chat | 81.8 | 5 |
+| chat | 90.9 | 5 |
 | export | 100 | 1 |
 | account | 100 | 1 |
 
@@ -75,14 +75,14 @@ Diff images: `replica/diffs/S01-1440.png`, `S01-390.png`, `S02-1440.png`, `S02-3
 | flow | Limesnap does | Reelplain does | fix or keep |
 | --- | --- | --- | --- |
 | F01 get started | pay before any use ($47+, no free plan); the 7-day refund is by email request | free plan, 10 credits, no card | **keep**, the core of the angle |
-| F01 sign-in | show/hide password toggle | no toggle (our own component spec asked for one) | **fix**: small |
-| F01 sign-in | "By clicking continue, you agree to our Terms and Privacy Policy" under the button | no consent line | **fix**: legal; needs the Terms and Privacy pages from launch |
+| F01 sign-in | show/hide password toggle | show/hide toggle (F01-E8) | **done** |
+| F01 sign-in | "By clicking continue, you agree to our Terms and Privacy Policy" under the button | consent line built; shows once `NEXT_PUBLIC_TERMS_URL` and `NEXT_PUBLIC_PRIVACY_URL` are set | **done**; needs your legal pages |
 | F01 sign-up | Instagram handle at onboarding, public profile scraped (including other people's handles) | no IG step | **keep** the refusal; offer official Instagram Login later |
 | F02 make a reel | ~4 clicks: attach → prompt → send → download | 4 clicks: attach → prompt → "Make reel · 4 credits" → download; the price is visible before the click at no extra step | **keep**: same click count, cost shown up front |
 | F02 when a render fails | unknown (behind the login) | fails, refunds automatically, says so in the chat, logs it in the credit history, emails | **keep** |
 | F02 credits | two meters (30 "generation" + 300 "chat" credits on Starter) | one meter, with every spend and refund listed | **keep**: simpler |
-| F04 ideas in chat | a chat-only brainstorm, metered by chat credits | **not built**; every message makes a generation | **build** (needs the Claude key) |
-| F05 editor | add scene / add text / add image / background from URL or Projects / global background video | text, position, style, duration, reorder, delete, caption; free save; 1-credit re-render | **build** add scene, add image and background swap |
+| F04 ideas in chat | a chat-only brainstorm, metered by chat credits | Ideas mode: idea cards, "Use this idea" fills the composer, 1 credit quoted and charged once | **done**; real answers need the Claude key |
+| F05 editor | add scene / add text / add image / background from URL or Projects / global background video | add scene / add image / duplicate / background from own media, upload or colour / up to 4 text layers; free save; 1-credit re-render | **done**, except global background video and URL import |
 | F06 cancel | "contact support … or manage your subscription through your account settings" | one-click Stripe portal, keep the plan until the period ends, reminder email before renewal | **keep** (verify live) |
 | emails | unknown | confirm, reset, refund, renewal reminder, payment failed | **keep** |
 | remembered between visits | chats, projects, generated posts | chats, projects, library, credit history | parity |
@@ -92,7 +92,7 @@ Diff images: `replica/diffs/S01-1440.png`, `S01-390.png`, `S02-1440.png`, `S02-3
 1. **Verify the planner with a real Claude key.** This moves 3 must-haves and carousels to done, and it's the product's core. Measure plan quality and cost per plan on 30 real prompts (`architecture.md` estimates $0.05–0.10).
 2. **Stripe test mode end to end:** Checkout with `4242…`, decline with `4000 0000 0000 0002`, cancel in the portal. Then the subscription must-have is done.
 3. **Google OAuth client:** the last must-have. Start Google's brand verification now; it takes days.
-4. **Ideas chat (F04/S09):** chat-only answers with no render, priced as a quote like everything else.
-5. **Editor completion:** add scene, add text, add image, swap background. Plus the two quick sign-in fixes (password toggle, consent line once the legal pages exist).
+4. ~~Ideas chat~~: **done** (8521d13).
+5. ~~Editor completion + sign-in fixes~~: **done** (8521d13).
 
-Items 1–3 are blocked on accounts only you can create. Items 4–5 are `/replica-build` work I can do now.
+**Now next:** items 1–3 above, which only you can unblock. After those: project assignment for uploads, caption presets, the global background video, and the Pexels stock picker.

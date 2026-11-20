@@ -4,16 +4,16 @@ Sign up / sign in with email + password,onboarding,should,yes,yes,"Fake-mode aut
 Chat workspace: prompt the AI to generate content,chat,must,yes,yes,S06; core loop | S06; prompt + attachments + reel/carousel
 Chat history list in sidebar; auto-titled chats,chat,should,yes,yes,S06 | Titled from the first line of the prompt
 Attach videos/images to a prompt,chat,must,yes,yes,S06 composer | Type and size checked before storing; ffprobe metadata
-"AI idea generation (hooks, post ideas) in chat",chat,should,yes,no,S09; Limesnap meters as chat credits | Needs the Claude planner (replica-backend)
+"AI idea generation (hooks, post ideas) in chat",chat,should,yes,partial,"S09; Limesnap meters as chat credits | Built: Ideas mode, idea cards, 'Use this idea', 1 credit charged atomically; tested (F04). Answers come from the stand-in until the Claude key is live"
 Message feedback: copy / thumbs up / thumbs down,chat,could,yes,yes,S06
 Generate reel: scene-based 9:16 video with text overlays from assets + prompt,generation,must,yes,partial,"S08; hard part #1/#2 | Claude planner built (structured outputs, owner-only asset enum); not run live yet (no API key in this session)"
 Generate carousel: multi-slide post with text overlays,generation,should,yes,partial,"S07 | Same: Claude planner built, not run live"
 AI-written post caption with each generation,generation,must,yes,partial,S07/S08 | Claude planner writes caption + hashtags; not run live yet
 Inline preview of reel (player) and carousel (swipe),generation,must,yes,yes,S07/S08 | Video player; carousel with buttons + arrow labels
 Download reel mp4 / carousel images,export,must,yes,yes,Per-slide download for carousels
-Scene editor: scene list / add text / add image / duration / background,editor,should,yes,partial,"S10; Reelplain fix #4 makes this mobile-friendly | Text, position, style, duration, reorder, delete, caption; no add-scene/add-image/background swap yet"
+Scene editor: scene list / add text / add image / duration / background,editor,should,yes,yes,"S10; Reelplain fix #4 makes this mobile-friendly | Add scene/image/duplicate, background from own media, upload or colour, up to 4 text layers, duration, reorder, delete; tested (F05-H2)"
 Global background video for all scenes,editor,could,yes,no,S10
-Carousel slide editor,editor,could,guess,partial,S11 not seen | Same editor as reels
+Carousel slide editor,editor,could,guess,yes,S11 not seen | Same editor as reels (photos only for backgrounds)
 Projects to group uploads,library,should,yes,partial,S12 | Create + list + all uploads; assigning uploads to a project not built
 Generated posts library,library,should,yes,yes,S13 | S13 with status per item
 Stock image/video picker (Pexels/Pixabay official APIs),library,could,yes,no,S15; their library is licensed - use own provider | Needs a Pexels key

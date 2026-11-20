@@ -14,16 +14,16 @@
 | ID | date | status | missing | harder than expected |
 | --- | --- | --- | --- | --- |
 | S01 Landing | 2026-11-20 | done | real product screenshot (placeholder removed) | — |
-| S02 Sign in | 2026-11-20 | partial | Google OAuth (button shown, disabled until Supabase) | — |
+| S02 Sign in | 2026-11-20 | partial | Google OAuth live test (needs your client); consent line needs your legal URLs | — |
 | S03 Sign up | 2026-11-20 | partial | Google OAuth; email verification | — |
 | S04 Onboarding (brand voice) | — | not built | the whole screen; planned on the official Instagram Login API, no scraping | — |
 | S05 Pricing / checkout | 2026-11-20 | partial | Stripe checkout; plans shown, all users on Try | — |
 | S06 App shell + chat | 2026-11-20 | done | — | Cache Components: every per-user read had to stream in `<Suspense>`, and `usePathname` in the drawer had to as well; idempotency keys made during render would have been baked into the prerendered page, so they're now made on tap |
 | S07 Carousel result | 2026-11-20 | done | swipe gesture (prev/next buttons work) | — |
 | S08 Reel result | 2026-11-20 | done | — | — |
-| S09 Ideas in chat | — | not built | needs the Claude planner; every message currently creates a generation | — |
-| S10 Scene editor | 2026-11-20 | partial | add scene / add text / add image / swap background / global background video / clip trim | Remotion Player's controls overlap bottom-positioned text in the preview (render is unaffected) |
-| S11 Carousel editor | 2026-11-20 | partial | same as S10 (one editor serves both) | — |
+| S09 Ideas in chat | 2026-11-20 | done (stand-in answers) | live Claude answers need the key | the SQL function's replay path hit a PL/pgSQL column-name clash (`chat_id`); caught by the SQL test before shipping |
+| S10 Scene editor | 2026-11-20 | done | global background video, clip trim, image import by URL | Remotion Player's controls overlap bottom-positioned text in the preview (render is unaffected) |
+| S11 Carousel editor | 2026-11-20 | done | same as S10 (one editor serves both) | — |
 | S12 Projects | 2026-11-20 | partial | assigning uploads to a project; rename and delete | — |
 | S13 Library | 2026-11-20 | done | pagination (fine at small counts) | — |
 | S14 Settings | 2026-11-20 | partial | subscription management and one-tap cancel (Stripe); account deletion | — |
@@ -51,7 +51,7 @@
 - **Remotion license:** the Player logs a license notice until you confirm your license (see `architecture.md`). I didn't acknowledge it for you.
 - **Test leftovers:** the test media and e2e scripts live in the session scratchpad, not the repo. `/replica-test` will turn them into a committed Playwright suite.
 
-**Score:** **9 of 15 screens done or partial with the core states**, 3 not built (S04, S09, S15) plus S10/S11 partial.
+**Score (updated 8521d13):** **13 of 15 screens done or partial**; 2 not built (S04 brand-voice onboarding, S15 stock picker).
 
 **Feature matrix:**
 
