@@ -1,0 +1,211 @@
+{
+  "_about": "Reelplain design tokens (dark mode). Same roles, warm charcoal - not neutral black. Check: python3 contrast.py tokens.dark.json",
+  "color": {
+    "bg": "#171310",
+    "surface": "#211b17",
+    "surface-2": "#2c241f",
+    "border": "#3a312b",
+    "border-input": "#857a72",
+    "text": "#f6f1ec",
+    "text-muted": "#b6aaa1",
+    "accent": "#fb8a4f",
+    "accent-hover": "#fda070",
+    "accent-subtle": "#3a2216",
+    "on-accent": "#1c1714",
+    "focus": "#fb8a4f",
+    "danger": "#ff7a96",
+    "on-danger": "#1c1714",
+    "danger-subtle": "#3d1820",
+    "success": "#4fcf88",
+    "success-subtle": "#16301f",
+    "warning": "#f2b84b",
+    "warning-subtle": "#3a2a10",
+    "overlay": "rgba(0,0,0,.6)"
+  },
+  "pairs": [
+    [
+      "text",
+      "bg"
+    ],
+    [
+      "text",
+      "surface"
+    ],
+    [
+      "text",
+      "surface-2"
+    ],
+    [
+      "text-muted",
+      "bg"
+    ],
+    [
+      "text-muted",
+      "surface"
+    ],
+    [
+      "text-muted",
+      "surface-2"
+    ],
+    [
+      "on-accent",
+      "accent"
+    ],
+    [
+      "on-accent",
+      "accent-hover"
+    ],
+    [
+      "accent",
+      "bg"
+    ],
+    [
+      "accent",
+      "surface"
+    ],
+    [
+      "accent",
+      "accent-subtle"
+    ],
+    [
+      "danger",
+      "bg"
+    ],
+    [
+      "danger",
+      "danger-subtle"
+    ],
+    [
+      "success",
+      "bg"
+    ],
+    [
+      "success",
+      "success-subtle"
+    ],
+    [
+      "warning",
+      "bg"
+    ],
+    [
+      "warning",
+      "warning-subtle"
+    ],
+    [
+      "border-input",
+      "bg",
+      "ui"
+    ],
+    [
+      "border-input",
+      "surface",
+      "ui"
+    ],
+    [
+      "focus",
+      "bg",
+      "ui"
+    ],
+    [
+      "focus",
+      "surface",
+      "ui"
+    ],
+    [
+      "on-danger",
+      "danger"
+    ]
+  ],
+  "font": {
+    "sans": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+    "display": "Manrope, Inter, system-ui, sans-serif",
+    "mono": "ui-monospace, SFMono-Regular, Menlo, monospace"
+  },
+  "type": {
+    "xs": {
+      "size": 12,
+      "line": 16,
+      "weight": 500
+    },
+    "sm": {
+      "size": 14,
+      "line": 20,
+      "weight": 400
+    },
+    "base": {
+      "size": 16,
+      "line": 24,
+      "weight": 400
+    },
+    "lg": {
+      "size": 18,
+      "line": 28,
+      "weight": 600
+    },
+    "xl": {
+      "size": 24,
+      "line": 32,
+      "weight": 700
+    },
+    "2xl": {
+      "size": 32,
+      "line": 38,
+      "weight": 700
+    },
+    "display": {
+      "size": 48,
+      "line": 52,
+      "weight": 800
+    }
+  },
+  "space": [
+    0,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    96
+  ],
+  "radius": {
+    "sm": 6,
+    "md": 10,
+    "lg": 16,
+    "xl": 24,
+    "pill": 999
+  },
+  "control": {
+    "sm": 32,
+    "md": 40,
+    "lg": 48
+  },
+  "layout": {
+    "sidebar": 264,
+    "content-max": 1120,
+    "chat-max": 720,
+    "editor-panel": 320,
+    "header": 56,
+    "breakpoints": {
+      "sm": 640,
+      "md": 768,
+      "lg": 1024,
+      "xl": 1280
+    }
+  },
+  "shadow": {
+    "card": "0 1px 2px rgba(0,0,0,.4)",
+    "pop": "0 12px 32px rgba(0,0,0,.5)"
+  },
+  "motion": {
+    "fast": "120ms",
+    "base": "200ms",
+    "slow": "320ms",
+    "ease": "cubic-bezier(.2,.8,.2,1)",
+    "reduced": "respect prefers-reduced-motion: no transforms, opacity only"
+  }
+}
