@@ -80,6 +80,11 @@
 - **`getClaims()` accepted revoked sessions for up to an hour.** Pages and APIs now use `getUser()`, which checks with the auth server: one extra request per call, in exchange for an immediate "sign out everywhere".
 - **Supabase CLI parser:** it misreads `CASE … END` inside functions, so it was rewritten with `IF`.
 
+## Found in production (2026-11-20)
+
+- **Credits never granted, top-ups never added, failed renders never refunded.** The init migration revoked `spend_credits`, `refund_render`, `grant_monthly_credits` and `add_topup` from every role and never granted them to `service_role`. Local Postgres hid it; hosted Supabase returned "permission denied" on the first live `invoice.paid`. Fixed in `20261120000004_service_role_credit_grants.sql`, applied to the hosted DB, and verified: a live subscription upgrade granted 400 credits through the webhook. Browser roles still can't call them.
+- **Live checks passed:** sign-in, Claude ideas (5 ideas in 11 s, 1 credit charged once), Stripe webhook signature, subscription → plan sync.
+
 ## Not tested — needs your accounts
 
 | what | why untested | what you do |
