@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Composer } from "@/components/app/Composer";
 import { RenderCard } from "@/components/app/RenderCard";
 import { MessageActions } from "@/components/app/MessageActions";
+import { IdeaCards } from "@/components/app/IdeaCards";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { requireUser } from "@/lib/auth";
 import { getAssets, getChat, getGeneration, latestRenders, listMessages, NotFound } from "@/lib/data";
@@ -33,6 +34,7 @@ async function Thread({ params }: { params: Promise<{ id: string }> }) {
           return (
             <li key={m.id}>
               <p className="whitespace-pre-wrap break-words">{m.content}</p>
+              {m.ideas && <IdeaCards ideas={m.ideas} />}
               {gen && r && <div className="mt-3"><RenderCard initial={r} generationId={gen.id} kind={gen.kind} caption={gen.plan.caption} /></div>}
               <MessageActions id={m.id} text={m.content} feedback={m.feedback} />
             </li>

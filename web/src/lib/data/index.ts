@@ -50,6 +50,7 @@ export const getAssetsSystem = pick("getAssetsSystem");
 export const logJobFailure = pick("logJobFailure");
 export const hitRateLimit = pick("hitRateLimit");
 export const discardMessage = pick("discardMessage");
+export const createIdeasReply = pick("createIdeasReply");
 
 // Fake-mode-only auth helpers (Supabase Auth replaces them).
 export { createUser, findCredential, createSession, deleteSession, userForSession } from "./fake-store";

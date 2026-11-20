@@ -3,6 +3,7 @@ import { Suspense, useActionState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { Notice } from "@/components/ui/Notice";
 import { LinkErrorNotice } from "./LinkErrorNotice";
 import { requestPasswordReset, setNewPassword, signIn, signInWithGoogle, signUp, type AuthState } from "./actions";
@@ -15,6 +16,18 @@ const COPY: Record<Mode, { h: string; sub: string; cta: string }> = {
   forgot: { h: "Reset your password", sub: "We'll email you a link.", cta: "Send reset link" },
   reset: { h: "Choose a new password", sub: "At least 8 characters.", cta: "Save password" },
 };
+
+/** Shown once the legal pages exist: set NEXT_PUBLIC_TERMS_URL and NEXT_PUBLIC_PRIVACY_URL. */
+function ConsentLine() {
+  const terms = process.env.NEXT_PUBLIC_TERMS_URL, privacy = process.env.NEXT_PUBLIC_PRIVACY_URL;
+  if (!terms || !privacy) return null;
+  return (
+    <p className="text-center text-xs text-text-muted">
+      By continuing, you agree to the <a className="underline hover:text-text" href={terms}>Terms</a> and{" "}
+      <a className="underline hover:text-text" href={privacy}>Privacy Policy</a>.
+    </p>
+  );
+}
 
 export function AuthForm({ mode, google }: { mode: Mode; google: boolean }) {
   const [state, action, pending] = useActionState<AuthState, FormData>(ACTIONS[mode], undefined);
@@ -40,10 +53,11 @@ export function AuthForm({ mode, google }: { mode: Mode; google: boolean }) {
           {state?.error && <Notice kind="danger" role="alert">{state.error}</Notice>}
           {mode === "sign-up" && <Field label="Name" name="name" autoComplete="name" required error={state?.fieldErrors?.name} />}
           {needsEmail && <Field label="Email" name="email" type="email" autoComplete="email" required defaultValue={state?.email} error={state?.fieldErrors?.email} />}
-          {needsPassword && <Field label={mode === "reset" ? "New password" : "Password"} name="password" type="password"
+          {needsPassword && <PasswordField label={mode === "reset" ? "New password" : "Password"} name="password"
             autoComplete={mode === "sign-in" ? "current-password" : "new-password"} required minLength={8}
             help={mode === "sign-up" ? "At least 8 characters." : undefined} error={state?.fieldErrors?.password} />}
           <Button type="submit" size="lg" className="w-full" loading={pending}>{c.cta}</Button>
+          {(mode === "sign-in" || mode === "sign-up") && <ConsentLine />}
         </form>
       )}
       <div className="mt-6 space-y-2 text-sm text-text-muted">

@@ -9,12 +9,16 @@ import { cn } from "@/components/ui/cn";
 import type { Asset, Quote } from "@/lib/data/types";
 
 type Attachment = { localId: string; name: string; status: "uploading" | "ready" | "failed"; asset?: Asset; error?: string };
-type Kind = "reel" | "carousel";
+type Kind = "reel" | "carousel" | "ideas";
+const QUOTE_KIND = { reel: "new-reel", carousel: "new-carousel", ideas: "ideas" } as const;
+/** Fired by an idea card's "Use this idea" button; the composer fills itself in. */
+export const USE_IDEA_EVENT = "reelplain:use-idea";
+export type UseIdeaDetail = { text: string; format: "reel" | "carousel" };
 const dur = (ms: number | null) => (ms ? `${Math.floor(ms / 60000)}:${String(Math.round(ms / 1000) % 60).padStart(2, "0")}` : "");
 
 // Supabase mode: sign, upload straight to storage, then confirm (large videos never pass through the web server).
 // Fake mode: one multipart request to the app.
-async function uploadOne(file: File): Promise<{ r: Response | null; j: { asset?: Asset; error?: { message: string } } | null }> {
+export async function uploadOne(file: File): Promise<{ r: Response | null; j: { asset?: Asset; error?: { message: string } } | null }> {
   const parse = async (res: Response | null) => (res ? await res.json().catch(() => null) : null);
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!supaUrl) {
@@ -46,7 +50,7 @@ export function Composer({ chatId }: { chatId: string | null }) {
   const textArea = useRef<HTMLTextAreaElement>(null);
 
   const fetchQuote = useCallback(async (k: Kind): Promise<Quote | null> => {
-    const r = await fetch("/api/quotes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: k === "reel" ? "new-reel" : "new-carousel" }) }).catch(() => null);
+    const r = await fetch("/api/quotes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: QUOTE_KIND[k] }) }).catch(() => null);
     return r?.ok ? (await r.json()).quote : null;
   }, []);
   const refreshQuote = useCallback(async (k: Kind) => setQuote(await fetchQuote(k)), [fetchQuote]);
@@ -55,6 +59,15 @@ export function Composer({ chatId }: { chatId: string | null }) {
     void fetchQuote(kind).then((q) => { if (live) setQuote(q); });
     return () => { live = false; };
   }, [kind, fetchQuote]);
+  useEffect(() => {
+    const onUse = (e: Event) => {
+      const d = (e as CustomEvent<UseIdeaDetail>).detail;
+      setText(d.text); setKind(d.format); setError(null);
+      textArea.current?.focus();
+    };
+    window.addEventListener(USE_IDEA_EVENT, onUse);
+    return () => window.removeEventListener(USE_IDEA_EVENT, onUse);
+  }, []);
 
   async function upload(list: FileList | null) {
     if (!list) return;
@@ -68,7 +81,7 @@ export function Composer({ chatId }: { chatId: string | null }) {
     if (fileInput.current) fileInput.current.value = "";
   }
 
-  const liveQuote = quote && quote.kind === (kind === "reel" ? "new-reel" : "new-carousel") ? quote : null;
+  const liveQuote = quote && quote.kind === QUOTE_KIND[kind] ? quote : null;
   const ready = files.filter((f) => f.status === "ready" && f.asset);
   const uploading = files.some((f) => f.status === "uploading");
   const hasVideo = ready.some((f) => f.asset!.kind === "video");
@@ -82,9 +95,11 @@ export function Composer({ chatId }: { chatId: string | null }) {
     if (new Date(quote.expiresAt).getTime() < Date.now()) { await refreshQuote(kind); return; }
     idemKey.current ??= crypto.randomUUID();
     setSending(true); setError(null);
-    const r = await fetch("/api/generations", {
+    const r = await fetch(kind === "ideas" ? "/api/ideas" : "/api/generations", {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chatId, prompt: text, attachmentIds: ready.map((f) => f.asset!.id), kind, quoteId: quote.id, idempotencyKey: idemKey.current }),
+      body: JSON.stringify(kind === "ideas"
+        ? { chatId, prompt: text, quoteId: quote.id, idempotencyKey: idemKey.current }
+        : { chatId, prompt: text, attachmentIds: ready.map((f) => f.asset!.id), kind, quoteId: quote.id, idempotencyKey: idemKey.current }),
     }).catch(() => null);
     const j = r ? await r.json().catch(() => null) : null;
     setSending(false);
@@ -95,12 +110,12 @@ export function Composer({ chatId }: { chatId: string | null }) {
       return;
     }
     idemKey.current = null;
-    setText(""); setFiles([]); void refreshQuote(kind);
+    setText(""); if (kind !== "ideas") setFiles([]); void refreshQuote(kind);
     if (j.chatId && j.chatId !== chatId) router.push(`/app/chats/${j.chatId}`);
     router.refresh();
   }
 
-  const label = kind === "reel" ? "Make reel" : "Make carousel";
+  const label = kind === "reel" ? "Make reel" : kind === "carousel" ? "Make carousel" : "Get ideas";
   return (
     <form onSubmit={(e) => { e.preventDefault(); void submit(); }} aria-label="Message Reelplain" className="rounded-lg border border-border-input bg-bg p-3 shadow-card">
       {error && (
@@ -130,6 +145,7 @@ export function Composer({ chatId }: { chatId: string | null }) {
         placeholder="Drop in a video or a few photos and say what you want. I'll show the cost first."
         className="block w-full resize-none bg-transparent text-base text-text placeholder:text-text-muted focus:outline-none"
       />
+      {kind === "ideas" && ready.length > 0 && <p className="mt-2 text-sm text-text-muted">Ideas use your words only. Your files stay attached for when you make something.</p>}
       {carouselBlocked && <p className="mt-2 text-sm text-warning font-semibold">Carousels use photos. Remove the videos, or make a reel.</p>}
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -138,10 +154,10 @@ export function Composer({ chatId }: { chatId: string | null }) {
             <span aria-hidden="true">📎</span> Attach
           </label>
           <div role="group" aria-label="What to make" className="inline-flex rounded-md bg-surface-2 p-0.5">
-            {(["reel", "carousel"] as const).map((k) => (
+            {(["reel", "carousel", "ideas"] as const).map((k) => (
               <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}
                 className={cn("rounded-sm px-3 py-1 text-sm font-semibold", kind === k ? "bg-bg text-text shadow-card" : "text-text-muted")}>
-                {k === "reel" ? "Reel" : "Carousel"}
+                {k === "reel" ? "Reel" : k === "carousel" ? "Carousel" : "Ideas"}
               </button>
             ))}
           </div>
@@ -157,7 +173,7 @@ export function Composer({ chatId }: { chatId: string | null }) {
         </Button>
         )}
       </div>
-      {liveQuote && <p className="mt-2 text-xs text-text-muted">{liveQuote.balanceAfter >= 0 ? `You'll have ${liveQuote.balanceAfter} left.` : ""}{liveQuote.watermark ? " Free plan exports carry a small watermark." : ""} If it fails, the credits come back.</p>}
+      {liveQuote && <p className="mt-2 text-xs text-text-muted">{liveQuote.balanceAfter >= 0 ? `You'll have ${liveQuote.balanceAfter} left.` : ""}{kind === "ideas" ? " If it fails, you're not charged." : `${liveQuote.watermark ? " Free plan exports carry a small watermark." : ""} If it fails, the credits come back.`}</p>}
     </form>
   );
 }

@@ -158,6 +158,17 @@ test.describe("F01 get started and manage the account", () => {
     await expect(p.getByText(/already an account with this email/)).toBeVisible();
   });
 
+  test("F01-E8 password show/hide toggle", async ({ page }) => {
+    await page.goto("/sign-in");
+    const pw = page.getByLabel("Password", { exact: true });
+    await pw.fill("secret-pass");
+    await expect(pw).toHaveAttribute("type", "password");
+    await page.getByRole("button", { name: "Show password" }).click();
+    await expect(pw).toHaveAttribute("type", "text");
+    await expect(page.getByRole("button", { name: "Hide password" })).toHaveAttribute("aria-pressed", "true");
+    await a11y(page, "sign-in with password shown");
+  });
+
   test("F01-N3 signed out visitors are sent to sign in", async ({ page }) => {
     const r = await page.request.get("/app/library", { maxRedirects: 0 });
     expect(r.status()).toBe(307);

@@ -16,9 +16,11 @@ export type Asset = {
   status: "pending" | "ready" | "failed"; description: string | null; createdAt: string;
 };
 export type Chat = { id: string; userId: string; projectId: string | null; title: string; createdAt: string; updatedAt: string };
+export type Idea = { title: string; hook: string; angle: string; format: "reel" | "carousel" };
 export type Message = {
   id: string; chatId: string; userId: string; role: "user" | "assistant"; content: string;
   attachmentIds: string[]; generationId: string | null; feedback: "up" | "down" | null; createdAt: string;
+  ideas?: Idea[] | null;
 };
 export type Generation = {
   id: string; userId: string; chatId: string | null; messageId: string | null; kind: "reel" | "carousel";

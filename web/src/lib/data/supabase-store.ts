@@ -42,7 +42,7 @@ const toAsset = (r: Row): Asset => ({
   status: r.status as Asset["status"], description: (r.description as string) ?? null, createdAt: s(r.created_at),
 });
 const toChat = (r: Row): Chat => ({ id: s(r.id), userId: s(r.user_id), projectId: (r.project_id as string) ?? null, title: s(r.title), createdAt: s(r.created_at), updatedAt: s(r.updated_at) });
-const toMessage = (r: Row): Message => ({ id: s(r.id), chatId: s(r.chat_id), userId: s(r.user_id), role: r.role as Message["role"], content: s(r.content), attachmentIds: (r.attachment_ids as string[]) ?? [], generationId: (r.generation_id as string) ?? null, feedback: (r.feedback as Message["feedback"]) ?? null, createdAt: s(r.created_at) });
+const toMessage = (r: Row): Message => ({ id: s(r.id), chatId: s(r.chat_id), userId: s(r.user_id), role: r.role as Message["role"], content: s(r.content), attachmentIds: (r.attachment_ids as string[]) ?? [], generationId: (r.generation_id as string) ?? null, feedback: (r.feedback as Message["feedback"]) ?? null, createdAt: s(r.created_at), ideas: (r.ideas as Message["ideas"]) ?? null });
 const toGeneration = (r: Row): Generation => ({ id: s(r.id), userId: s(r.user_id), chatId: (r.chat_id as string) ?? null, messageId: (r.message_id as string) ?? null, kind: r.kind as Generation["kind"], plan: r.plan as Plan, planVersion: n(r.plan_version), originalOnly: !!r.original_only, createdAt: s(r.created_at), updatedAt: s(r.updated_at) });
 const toRender = (r: Row): Render => ({
   id: s(r.id), generationId: s(r.generation_id), userId: s(r.user_id), planVersion: n(r.plan_version), status: r.status as Render["status"],
@@ -240,4 +240,15 @@ export async function discardMessage(userId: string, messageId: string, chatId: 
   const db = await userClient();
   await db.from("messages").delete().eq("id", messageId).eq("user_id", userId);
   if (chatId) await db.from("chats").delete().eq("id", chatId).eq("user_id", userId);
+}
+
+/** Ideas reply: both messages and the charge in one SQL transaction (create_ideas_reply). */
+export async function createIdeasReply(userId: string, i: { chatId: string | null; title: string; prompt: string; reply: string; ideas: NonNullable<Message["ideas"]>; quoteId: string; idempotencyKey: string }) {
+  const before = await getAccount(userId);
+  const res = await adminClient().rpc("create_ideas_reply", {
+    p_user: userId, p_chat: i.chatId, p_title: i.title, p_prompt: i.prompt, p_reply: i.reply, p_ideas: i.ideas, p_quote: i.quoteId, p_key: i.idempotencyKey,
+  });
+  if (res.error?.message.includes("insufficient_credits")) throw new InsufficientCredits(1, before.planCredits + before.topupCredits);
+  const row = (check(res, "ideas") as Row[])[0];
+  return { chatId: s(row.chat_id), messageId: s(row.message_id), replayed: !!row.replayed };
 }

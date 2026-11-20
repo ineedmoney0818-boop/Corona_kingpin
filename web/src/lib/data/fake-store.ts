@@ -337,3 +337,25 @@ export async function discardMessage(userId: string, messageId: string, chatId: 
   if (chatId) d.chats = d.chats.filter((c) => !(c.id === chatId && c.userId === userId));
   save();
 }
+
+export async function createIdeasReply(userId: string, i: { chatId: string | null; title: string; prompt: string; reply: string; ideas: NonNullable<Message["ideas"]>; quoteId: string; idempotencyKey: string }) {
+  const d = db();
+  const prior = d.messages.find((m) => m.userId === userId && (m as Message & { key?: string }).key === i.idempotencyKey);
+  if (prior) {
+    const reply = d.messages.filter((m) => m.chatId === prior.chatId && m.role === "assistant" && m.createdAt >= prior.createdAt)[0];
+    return { chatId: prior.chatId, messageId: reply?.id ?? prior.id, replayed: true };
+  }
+  const q = await getQuote(userId, i.quoteId);
+  if (q.kind !== "ideas") throw new Error("quote_expired");
+  const a = d.accounts.find((x) => x.userId === userId)!;
+  if (a.planCredits + a.topupCredits < q.credits) throw new InsufficientCredits(q.credits, a.planCredits + a.topupCredits);
+  const chat = i.chatId ? await getChat(userId, i.chatId) : await createChat(userId, i.title || "Ideas");
+  const um = { id: randomUUID(), chatId: chat.id, userId, role: "user" as const, content: i.prompt, attachmentIds: [], generationId: null, feedback: null, createdAt: now(), key: i.idempotencyKey };
+  const am = { id: randomUUID(), chatId: chat.id, userId, role: "assistant" as const, content: i.reply, attachmentIds: [], generationId: null, feedback: null, createdAt: now(), ideas: i.ideas };
+  d.messages.push(um, am);
+  const fromPlan = Math.min(a.planCredits, q.credits), fromTopup = q.credits - fromPlan;
+  a.planCredits -= fromPlan; a.topupCredits -= fromTopup;
+  if (q.credits > 0) ledger({ userId, kind: "spend", planDelta: -fromPlan, topupDelta: -fromTopup, renderId: null, ref: null, note: "ideas" });
+  chat.updatedAt = now(); save();
+  return { chatId: chat.id, messageId: am.id, replayed: false };
+}
