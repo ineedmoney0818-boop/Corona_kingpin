@@ -1,0 +1,9 @@
+feature,area,priority,original,clone,notes
+Upfront pricing; no paywall on export of finished work (watermarked free export),billing,must,no,no,fixes.md #1 - price/paywall 124 reviews
+Auto-refund credits on failed render or rejected regeneration; show credit cost before action,billing,must,no,no,fixes.md #2 - credits 74 reviews
+One-tap cancel in app and web; keep paid period and credits after cancel,billing,must,no,no,fixes.md #3 - billing 63 reviews
+Full manual edit on mobile after AI draft (trim/caption text/position/delete),editor,must,no,no,fixes.md #4 - manual control ~25 + OpusClip mobile requests
+Autosave drafts and resumable uploads,editor,should,no,no,fixes.md #5 - crashes 66 + uploads 16
+Caption presets: save favourite / toggle off / single-word / movable,editor,should,no,no,fixes.md #6 - thin
+Original-only mode: no AI image regeneration; auto-reframe off by default,editor,should,no,no,fixes.md #7 - thin
+Human support path with stated reply time,support,could,no,no,fixes.md #8 - thin
