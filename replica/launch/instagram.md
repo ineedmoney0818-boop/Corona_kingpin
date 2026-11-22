@@ -5,15 +5,20 @@ Goal: **paid sign-ups.** Path: Reel → comment PLAIN → DM the sign-up link �
 ## Account
 
 - Separate **@reelplain** account. Not Outta The Madness: its audience is Louisville property owners, not people who make Reels.
-- Outta The Madness can appear as a case study ("a contractor who makes his Reels with Reelplain") on the Reelplain account.
+- Outta The Madness can appear as a case study ("a contractor who makes their Reels with Reelplain") on the Reelplain account.
 
 ### Bio
 
-> **Reelplain** · AI reels with the price on the button
-> ✂️ Clips + captions from your videos
-> 💸 Failed renders are free · cancel any time
-> 👇 Start free, no card
-> coronakingpin-web.vercel.app/sign-up?utm_source=instagram
+Instagram fills these from separate fields. Only the **Bio** field counts toward the 150-character limit.
+
+- **Name:** `Reelplain | AI Reels Editor` (the name field is searchable, so the keyword goes here)
+- **Bio** (103 characters):
+  ```
+  AI reels with the price on the button 💸
+  Failed renders are free. Cancel any time.
+  Start free, no card 👇
+  ```
+- **Link** (Edit profile → Links): `coronakingpin-web.vercel.app/sign-up?utm_source=instagram`
 
 Move to a real domain (reelplain.com was unregistered on 2026-11-20) when you can. A `vercel.app` link looks unfinished to strangers.
 
