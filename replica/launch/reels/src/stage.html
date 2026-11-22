@@ -1,0 +1,151 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--bg:#171310;--s1:#211b17;--s2:#2c241f;--bd:#3a312b;--tx:#f6f1ec;--mu:#b6aaa1;--ac:#fb8a4f;--ok:#4fcf88;--bad:#ff7a96}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);color:var(--tx);font-family:"Inter Display","Inter",sans-serif}
+#root{position:absolute;inset:0}
+.abs{position:absolute}
+.card{background:var(--s1);border:2px solid var(--bd);border-radius:36px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:28px;font-weight:700}
+.hook{left:70px;right:70px;top:190px;text-align:center;font-weight:900;font-size:80px;line-height:1.3;letter-spacing:-2px}
+.hook span{background:var(--tx);color:var(--bg);padding:6px 22px;border-radius:18px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.cap{left:80px;right:80px;top:1250px;text-align:center;font-weight:900;font-size:76px;line-height:1.1;letter-spacing:-1px;text-shadow:0 6px 24px rgba(0,0,0,.8)}
+.cap b{color:var(--ac)}
+.tap{width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.85);border:6px solid #fff;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.ring{border-radius:50%;border:6px solid #fff}
+.mu{color:var(--mu)}
+</style></head><body><div id="root"></div>
+<script>
+const W=1080,H=1920;
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const ease=x=>{x=clamp(x);return 1-Math.pow(1-x,3)};
+const back=x=>{x=clamp(x);const c=1.7;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const lerp=(a,b,x)=>a+(b-a)*x;
+const pop=(t,t0,d=.35)=>{const k=back((t-t0)/d);return `opacity:${clamp((t-t0)/.15)};transform:scale(${lerp(.6,1,k)})`};
+const rise=(t,t0,d=.4)=>{const k=ease((t-t0)/d);return `opacity:${clamp((t-t0)/.2)};transform:translateY(${lerp(60,0,k)}px)`};
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function tap(t,t0,x,y){ if(t<t0-.35||t>t0+.6) return '';
+  const a=clamp((t-(t0-.35))/.3), press=t>=t0&&t<t0+.15?.85:1, out=clamp(1-(t-(t0+.3))/.3);
+  const r=clamp((t-t0)/.5), rs=lerp(1,2.6,r);
+  return `<div class="abs tap" style="left:${x-60}px;top:${y-60}px;opacity:${a*out};transform:scale(${press})"></div>`+
+   (t>=t0?`<div class="abs ring" style="left:${x-60}px;top:${y-60}px;width:120px;height:120px;opacity:${1-r};transform:scale(${rs})"></div>`:'');
+}
+const S={};
+// ---------- scenes ----------
+S.title=(t,d,p)=>{ // p.lines:[{t,acc,size}]
+  return `<div class="abs" style="left:70px;right:70px;top:${p.top||520}px;text-align:center">`+
+   p.lines.map((l,i)=>`<div style="font-weight:900;font-size:${l.size||110}px;line-height:1.05;letter-spacing:-3px;margin-bottom:24px;color:${l.acc?'var(--ac)':'var(--tx)'};${pop(t,.15+i*(p.gap||.45))}">${l.t}</div>`).join('')+`</div>`;
+};
+S.editor=(t,d,p)=>{
+  const ph=clamp(t/(d-.6)); let h=`<div class="abs card" style="left:110px;top:440px;width:860px;height:640px;overflow:hidden">
+   <div class="abs" style="left:40px;top:30px;font-size:34px;font-weight:700">my_reel_FINAL_v7</div>
+   <div class="abs" style="left:250px;top:95px;width:300px;height:340px;border-radius:24px;left:280px;background:linear-gradient(160deg,#5b3a2a,#22303f)">
+     <div class="abs" style="left:20px;right:20px;bottom:40px;text-align:center;font-weight:900;font-size:36px">this took<br><span style="color:#ffd45c">FOREVER</span></div></div>
+   <div class="abs" style="left:40px;right:40px;top:465px;height:70px;display:flex;gap:8px">`+
+   [3,5,2,4,6,3,4].map((w,i)=>`<div style="flex:${w};border-radius:12px;background:${['#7c5cff','#3aa0ff','#ff6b8b','#33c48d'][i%4]};opacity:.85"></div>`).join('')+`</div>
+   <div class="abs" style="left:40px;right:40px;top:550px;height:40px;display:flex;gap:8px">`+
+   [6,4,8,5].map(w=>`<div style="flex:${w};border-radius:10px;background:#ffd45c;opacity:.7"></div>`).join('')+`</div>
+   <div class="abs" style="left:${40+780*ph}px;top:450px;width:6px;height:150px;background:#fff;border-radius:3px"></div>
+   <div class="abs mu" style="right:40px;top:34px;font-size:30px">⏱ ${ (1+ph*2).toFixed(1)} hrs</div>
+  </div>
+  <div class="abs btn" style="left:560px;top:1100px;width:360px;height:96px;background:#3aa0ff;color:#fff;font-size:40px">Export ⤓</div>`;
+  return h+tap(t,d-.5,740,1148);
+};
+S.paywall=(t,d,p)=>{
+  const k=back(t/.4);
+  return S.editor(9,10,{}).replace(/<div class="abs tap".*$/,'')+`<div class="abs" style="inset:0;background:rgba(0,0,0,${.65*clamp(t/.2)})"></div>
+  <div class="abs card" style="left:120px;top:${lerp(1900,560,k)}px;width:840px;height:720px;text-align:center;padding:60px 50px;background:#1d1d24;border-color:#444">
+   <div style="font-size:90px">🔒</div>
+   <div style="font-size:58px;font-weight:900;margin-top:16px">Export requires Pro</div>
+   <div class="mu" style="font-size:36px;margin-top:18px">Unlock HD export, no watermark & more</div>
+   <div class="btn" style="margin-top:56px;height:110px;background:linear-gradient(90deg,#8a5cff,#ff5ca8);font-size:42px;color:#fff">Continue · $29.99/week</div>
+   <div class="mu" style="font-size:28px;margin-top:22px">Auto-renews. Cancel anytime*</div>
+  </div>
+  <div class="abs" style="left:0;right:0;top:1440px;text-align:center;font-size:110px;${pop(t,1.1)}">🙂</div>`;
+};
+S.crash=(t,d,p)=>{
+  const fail=1.9, prog=t<fail?lerp(0,.87,ease(t/fail)):.87, f=t>=fail;
+  const cr = t<fail+.6?40:Math.round(lerp(40,32,clamp((t-fail-.6)/.6)));
+  return `<div class="abs card" style="left:110px;top:520px;width:860px;height:560px;padding:50px;${f?'border-color:var(--bad)':''}">
+   <div style="font-size:44px;font-weight:800">${f?'⚠️ Something went wrong':'✨ Generating your reel…'}</div>
+   <div class="mu" style="font-size:32px;margin-top:14px">${f?'Please try again.':'This can take a few minutes'}</div>
+   <div style="margin-top:70px;height:44px;border-radius:22px;background:var(--s2);overflow:hidden"><div style="height:100%;width:${prog*100}%;background:${f?'var(--bad)':'#8a5cff'}"></div></div>
+   <div style="margin-top:22px;font-size:40px;font-weight:800;text-align:right">${Math.round(prog*100)}%</div>
+   </div>
+   <div class="abs card" style="left:330px;top:1130px;width:420px;height:110px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;${t>fail+.6?'border-color:var(--bad)':''}">💎 ${cr} credits</div>
+   ${t>fail+.7?`<div class="abs" style="left:770px;top:1140px;font-size:60px;font-weight:900;color:var(--bad);${pop(t,fail+.7)}">−8</div>`:''}`;
+};
+S.refund=(t,d,p)=>{
+  const sw=1.0, ok=t>=sw;
+  return `<div class="abs" style="left:110px;top:430px;font-size:40px;font-weight:800;color:var(--ac)">reel<span style="color:var(--tx)">plain</span> <span class="mu" style="font-weight:600">· Library</span></div>
+  <div class="abs card" style="left:110px;top:520px;width:860px;height:240px;padding:44px">
+   <div style="font-size:44px;font-weight:800">Gym promo reel</div>
+   <div style="font-size:36px;margin-top:20px;color:${ok?'var(--ok)':'var(--mu)'}">${ok?'Didn\'t render · refunded':'Rendering…'}</div></div>
+  <div class="abs card" style="left:110px;top:800px;width:860px;height:180px;padding:44px;opacity:.6">
+   <div style="font-size:40px;font-weight:700">Coffee shop carousel</div><div class="mu" style="font-size:34px;margin-top:14px">Ready</div></div>
+  ${ok?`<div class="abs btn" style="left:190px;top:1050px;width:700px;height:120px;background:var(--ok);color:#0f2a1c;font-size:44px;${rise(t,sw+.2)}">✓ 4 credits refunded</div>`:''}`;
+};
+S.shot=(t,d,p)=>{ // p.src,p.y0,p.y1,p.hl:[x,y,w,h] in image px, p.h viewport height
+  const vh=p.h||1240, sc=860/1080, y=lerp(p.y0,p.y1,ease((t-.2)/Math.max(.5,(p.pan||d-.6))));
+  let hl='';
+  if(p.hl){const [x,yy,w,h]=p.hl, a=clamp((t-(p.hlt||1))/.3);
+    hl=`<div class="abs" style="left:${x*sc-10}px;top:${(yy-y)*sc-10}px;width:${w*sc+20}px;height:${h*sc+20}px;border:8px solid var(--ac);border-radius:28px;opacity:${a};box-shadow:0 0 0 2000px rgba(0,0,0,${.45*a})"></div>`;}
+  return `<div class="abs" style="left:110px;top:${p.top||380}px;width:860px;height:${vh}px;border-radius:44px;overflow:hidden;border:4px solid var(--bd);${rise(t,0,.35)}">
+   <img src="shots/${p.src}.png" class="abs" style="left:0;top:${-y*sc}px;width:860px">${hl}</div>`;
+};
+S.list=(t,d,p)=>`<div class="abs" style="left:90px;right:90px;top:${p.top||420}px">${p.title?`<div style="font-size:64px;font-weight:900;margin-bottom:40px;letter-spacing:-1px">${p.title}</div>`:''}`+
+  p.items.map((it,i)=>`<div class="card" style="padding:34px 40px;margin-bottom:22px;font-size:46px;font-weight:700;display:flex;gap:24px;align-items:center;${rise(t,.2+i*(p.gap||.6))}"><span style="color:var(--ac)">✓</span>${it}</div>`).join('')+`</div>`;
+S.math=(t,d,p)=>`<div class="abs" style="left:90px;right:90px;top:${p.top||400}px">`+
+  p.rows.map((r,i)=>`<div class="card" style="padding:34px 44px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;font-size:46px;${rise(t,(p.at?p.at[i]:.2+i*.7))}"><span>${r[0]}</span><b style="color:${r[2]?'var(--ok)':'var(--ac)'};font-size:54px">${r[1]}</b></div>`).join('')+`</div>`;
+S.cancel=(t,d,p)=>{
+  const T=[.9,2.2,3.5]; const step=t<T[0]+.3?0:t<T[1]+.3?1:t<T[2]+.3?2:3;
+  const secs=Math.min(t, T[2]+.3);
+  let body='';
+  if(step===0) body=`<div style="font-size:48px;font-weight:800">Settings · Plan</div><div class="mu" style="font-size:36px;margin-top:16px">Creator · $19/month</div>
+     <div class="btn" style="margin-top:60px;height:110px;border:3px solid var(--bd);font-size:40px">Manage or cancel plan</div>`;
+  if(step===1) body=`<div style="font-size:48px;font-weight:800">Billing</div><div class="mu" style="font-size:36px;margin-top:16px">Reelplain Creator · $19.00/month</div>
+     <div class="btn" style="margin-top:60px;height:110px;border:3px solid var(--bd);font-size:40px;color:var(--bad)">Cancel plan</div>`;
+  if(step===2) body=`<div style="font-size:48px;font-weight:800">Confirm cancellation</div><div class="mu" style="font-size:34px;margin-top:16px">Your plan stays active until the end of the period.</div>
+     <div class="btn" style="margin-top:50px;height:110px;background:var(--bad);color:#1c1714;font-size:40px">Cancel plan</div>`;
+  if(step===3) body=`<div style="font-size:52px;font-weight:900;color:var(--ok)">✓ Cancelled</div><div style="font-size:38px;margin-top:22px">You keep Creator and your credits until the period ends.</div><div class="mu" style="font-size:34px;margin-top:22px">No calls. No "are you sure?" maze.</div>`;
+  return `<div class="abs" style="left:0;right:0;top:330px;text-align:center;font-size:120px;font-weight:900;font-variant-numeric:tabular-nums;color:${step===3?'var(--ok)':'var(--tx)'}">0:0${Math.floor(secs)}.${Math.floor((secs%1)*10)}</div>
+   <div class="abs card" style="left:110px;top:560px;width:860px;height:500px;padding:56px">${body}</div>`+
+   tap(t,T[0],540,860)+tap(t,T[1],540,860)+tap(t,T[2],540,820);
+};
+S.beforeafter=(t,d,p)=>{
+  const tp=p.tap||2.2, after=t>tp+.5;
+  if(!after){ let bars='';for(let i=0;i<60;i++){const h=20+Math.abs(Math.sin(i*1.7)*Math.cos(i*.37))*120;bars+=`<div style="flex:1;height:${h}px;background:#6b5d55;border-radius:4px"></div>`}
+    return `<div class="abs" style="left:110px;top:500px;font-size:44px;font-weight:800">Raw clip <span class="mu">· 0:40 of rambling</span></div>
+    <div class="abs card" style="left:110px;top:580px;width:860px;height:360px;display:flex;align-items:center;gap:5px;padding:30px">${bars}</div>
+    <div class="abs btn" style="left:190px;top:1010px;width:700px;height:120px;background:var(--ac);color:#1c1714;font-size:46px;${pop(t,.6)}">Make reel · 4 credits</div>`+tap(t,tp,540,1070);}
+  const lt=t-tp-.5;
+  return `<div class="abs" style="left:250px;top:380px;width:580px;height:860px;border-radius:40px;overflow:hidden;background:linear-gradient(170deg,#4a3226,#1f2c3a);${pop(lt,0)}">
+    <div class="abs" style="left:30px;right:30px;top:520px;text-align:center;font-size:52px;font-weight:900">the <span style="color:#ffd45c">one</span> tip<br>that matters</div>
+    <div class="abs" style="left:30px;top:30px;font-size:30px;background:rgba(0,0,0,.5);padding:8px 18px;border-radius:14px">0:18 · captions on</div></div>
+    <div class="abs btn" style="left:140px;top:1100px;width:800px;height:100px;background:var(--s1);border:3px solid var(--ok);color:var(--ok);font-size:38px;${rise(lt,.6)}">4 credits · shown before I tapped</div>`;
+};
+S.cta=(t,d,p)=>`<div class="abs" style="left:0;right:0;top:400px;text-align:center;font-size:72px;font-weight:900;color:var(--ac);letter-spacing:-1px;${pop(t,.1)}">reel<span style="color:var(--tx)">plain</span></div>
+  <div class="abs card" style="left:140px;top:600px;width:800px;padding:40px 46px;display:flex;gap:28px;align-items:center;${pop(t,.5)}">
+   <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#fb8a4f,#c2410c);flex:none"></div>
+   <div><div class="mu" style="font-size:32px">you · just now</div><div style="font-size:64px;font-weight:900;margin-top:6px">PLAIN</div></div></div>
+  <div class="abs" style="left:80px;right:80px;top:900px;text-align:center;font-size:54px;font-weight:800;line-height:1.2;${rise(t,1.0)}">Comment <span style="color:var(--ac)">PLAIN</span> and I'll DM you the link</div>
+  <div class="abs" style="left:80px;right:80px;top:1080px;text-align:center;font-size:40px;${rise(t,1.4)}" class="mu">Start free · no card</div>`;
+// ---------- timeline ----------
+let TL=null;
+window.setTL=x=>{TL=x};
+window.render=t=>{
+  let h='', sc=TL.scenes.find(s=>t>=s.start&&t<s.start+s.dur)||TL.scenes[TL.scenes.length-1];
+  const lt=t-sc.start;
+  h+=S[sc.type](lt,sc.dur,sc.p||{});
+  // fade between scenes
+  const fi=clamp(lt/.12), fo=clamp((sc.start+sc.dur-t)/.12);
+  h=`<div class="abs" style="inset:0;opacity:${sc===TL.scenes[0]?1:fi}">${h}</div>`;
+  if(TL.hook&&t<TL.hookDur) h+=`<div class="abs hook" style="${pop(t,0,.3)}">${TL.hook.split('|').map(x=>`<span>${x}</span>`).join('<br>')}</div>`;
+  // captions: chunk of words around current
+  const w=TL.words, i=w.findIndex(x=>t>=x.s&&t<x.e+.25);
+  if(i>=0 && !sc.nocap){ const c=w[i].chunk, cw=w.filter(x=>x.chunk===c);
+    h+=`<div class="abs cap">${cw.map(x=>x===w[i]?`<b>${esc(x.w)}</b>`:esc(x.w)).join(' ')}</div>`; }
+  document.getElementById('root').innerHTML=h;
+};
+</script></body></html>
