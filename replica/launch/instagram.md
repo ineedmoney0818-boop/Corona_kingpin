@@ -160,4 +160,10 @@ Videos are hosted in the public Supabase bucket `marketing` (`/storage/v1/object
 
 Not automatable through Windsor: DMs, trending audio, Instagram's AI label (so captions say "Voice: AI"). #4 (better filmed on camera) and #5 (waiting on the one-tap copy fix) are not scheduled.
 
-Sign-ups don't record `utm_source`, so Instagram sign-ups can't be separated from others yet.
+Sign-ups record first-touch `utm_source` / `utm_campaign` in `profiles.signup_source` / `signup_campaign` (cookie `rp_src`, 30 days, set on `/`, `/pricing`, `/sign-up`). Instagram paid users:
+
+```sql
+select p.signup_source, p.signup_campaign, count(*) signups,
+       count(*) filter (where p.plan <> 'try') paid
+from profiles p where p.created_at > now() - interval '7 days' group by 1, 2;
+```
