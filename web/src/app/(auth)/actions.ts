@@ -8,6 +8,7 @@ import { userClient } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { deleteUserFiles } from "@/lib/storage";
 import { cancelSubscriptionsNow } from "@/lib/billing/stripe";
+import { readSource } from "@/lib/signup-source";
 
 export type AuthState = { error?: string; notice?: string; fieldErrors?: { email?: string; password?: string; name?: string }; email?: string } | undefined;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,7 +35,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   if (await ipLimited("signup", 10)) return { error: "Too many sign-ups from here. Try again in 15 minutes.", email };
   if (isSupabase()) {
     const db = await userClient();
-    const { data, error } = await db.auth.signUp({ email, password, options: { data: { full_name: name.slice(0, 60) }, emailRedirectTo: `${siteUrl()}/auth/confirm?next=/app` } });
+    const { data, error } = await db.auth.signUp({ email, password, options: { data: { full_name: name.slice(0, 60), ...(await readSource()) }, emailRedirectTo: `${siteUrl()}/auth/confirm?next=/app` } });
     if (error) return { error: error.message.includes("already") ? "There's already an account with this email. Sign in instead." : "We couldn't make that account. Try again.", email };
     if (!data.session) return { notice: `Check ${email} for a link to confirm your account.`, email };
     redirect("/app");
