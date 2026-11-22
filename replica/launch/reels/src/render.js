@@ -28,6 +28,9 @@ const FPS = 30;
     const buf = await p.screenshot({ type: 'jpeg', quality: 92 });
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
   }
-  ff.stdin.end(); await new Promise(r => ff.on('close', r));
-  await b.close(); console.log(name, N, 'frames');
-})();
+  ff.stdin.end();
+  const [code, signal] = await new Promise(r => ff.on('close', (c, s) => r([c, s])));
+  await b.close();
+  if (code !== 0) throw new Error(`ffmpeg failed for ${name}: ${signal ?? `exit ${code}`}`);
+  console.log(name, N, 'frames');
+})().catch(e => { console.error(e.message || e); process.exit(1); });

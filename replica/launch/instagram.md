@@ -135,6 +135,7 @@ Same format: 15–30 s, vertical, captions burned in, ending with "Comment PLAIN
 `reels/src/` has the whole pipeline. Edit `reels.py` (scripts and scenes), then run:
 
 ```bash
+cd replica/launch/reels/src   # every command below runs from here
 pip install kokoro-onnx soundfile
 # models (~350 MB, not committed):
 #   github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/{kokoro-v1.0.onnx,voices-v1.0.bin} → voices/
@@ -153,7 +154,7 @@ Windsor's `instagram` connector is linked to @reelplain (account `17841444991627
 |---|---|---|
 | Post #3 What $19 gets | Tue Nov 24, 7:12 PM | `create_video_post`, caption + "Voice: AI" + hashtags |
 | Post #6 Before/after | Sat Nov 28, 7:12 PM | same |
-| PLAIN comment replies | Daily 10:07, 1:07, 4:07, 7:07, 10:07 | Public reply "link's in our bio", flags anything else |
+| PLAIN comment replies | Daily 10:07, 1:07, 4:07, 7:07, 10:07 | Public reply "link's in our bio", flags anything else. The bio link carries `utm_source=instagram` but no campaign, so these sign-ups show as Instagram, not `plain` (links in comments aren't clickable, so a tagged link there wouldn't help) |
 | Sunday report | Sun 6:43 PM | Reel insights, sign-ups, what to make next |
 
 Videos are hosted in the public Supabase bucket `marketing` (`/storage/v1/object/public/marketing/reels/<file>.mp4`).

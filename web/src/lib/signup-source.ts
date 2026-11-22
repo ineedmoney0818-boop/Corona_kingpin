@@ -14,7 +14,7 @@ function cleanTag(v: string | null | undefined): string | null {
 export async function readSource(): Promise<{ signup_source: string; signup_campaign: string | null } | null> {
   const raw = (await cookies()).get(SOURCE_COOKIE)?.value;
   if (!raw) return null;
-  const [s, c] = decodeURIComponent(raw).split("|");
+  const [s, c] = raw.split("|"); // cookies().get() already decodes the value
   const source = cleanTag(s);
   return source ? { signup_source: source, signup_campaign: cleanTag(c) } : null;
 }

@@ -143,7 +143,8 @@ window.render=t=>{
   h=`<div class="abs" style="inset:0;opacity:${sc===TL.scenes[0]?1:fi}">${h}</div>`;
   if(TL.hook&&t<TL.hookDur) h+=`<div class="abs hook" style="${pop(t,0,.3)}">${TL.hook.split('|').map(x=>`<span>${x}</span>`).join('<br>')}</div>`;
   // captions: chunk of words around current
-  const w=TL.words, i=w.findIndex(x=>t>=x.s&&t<x.e+.25);
+  const w=TL.words; let i=w.findIndex(x=>t>=x.s&&t<x.e);
+  if(i<0) i=w.findLastIndex(x=>t>=x.e&&t<x.e+.25); // brief hold in gaps only
   if(i>=0 && !sc.nocap){ const c=w[i].chunk, cw=w.filter(x=>x.chunk===c);
     h+=`<div class="abs cap">${cw.map(x=>x===w[i]?`<b>${esc(x.w)}</b>`:esc(x.w)).join(' ')}</div>`; }
   document.getElementById('root').innerHTML=h;
