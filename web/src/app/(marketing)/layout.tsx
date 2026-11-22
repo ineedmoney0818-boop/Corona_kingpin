@@ -12,7 +12,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </nav>
       </header>
       <main>{children}</main>
-      <footer className="mt-16 border-t border-border py-8 text-sm text-text-muted">© Reelplain · Privacy · Terms · Support</footer>
+      <footer className="mt-16 flex flex-wrap gap-x-4 gap-y-2 border-t border-border py-8 text-sm text-text-muted">
+        <span>© Reelplain</span>
+        <Link href="/privacy" className="hover:text-text hover:underline">Privacy</Link>
+        <Link href="/terms" className="hover:text-text hover:underline">Terms</Link>
+        <a href="mailto:hello@outtathemadness.com" className="hover:text-text hover:underline">Support</a>
+      </footer>
     </div>
   );
 }
