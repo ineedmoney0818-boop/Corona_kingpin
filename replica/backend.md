@@ -89,7 +89,7 @@
 
 `web/Dockerfile.worker` + `web/railway.json`. Tested locally against the live database: upload → Claude plan with real media → 1080×1920 reel in ~30 s; clean stop on SIGTERM.
 
-1. Railway → New Project → Deploy from GitHub repo → `Corona_kingpin`, branch `claude/affectionate-bohr-29srxq` (the repo has no `main` yet).
+1. Railway → New Project → Deploy from GitHub repo → `Corona_kingpin`, branch `main`.
 2. Service → Settings → **Root Directory** `web`. Railway then reads `web/railway.json` and builds `Dockerfile.worker`. If the build log says Railpack/Nixpacks instead, add the variable `RAILWAY_DOCKERFILE_PATH=Dockerfile.worker`.
 3. Variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `NEXT_PUBLIC_SITE_URL` (same values as Vercel). No Anthropic or Stripe keys: planning and billing run on Vercel.
 4. No public domain or port: the worker only talks out to Supabase.
