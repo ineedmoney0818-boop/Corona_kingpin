@@ -27,8 +27,17 @@ export type PriceKey = keyof typeof PRICES;
 async function customerFor(userId: string, email: string): Promise<string> {
   const db = adminClient();
   const { data } = await db.from("profiles").select("stripe_customer_id").eq("id", userId).single();
-  if (data?.stripe_customer_id) return data.stripe_customer_id;
-  const c = await stripe().customers.create({ email, metadata: { user_id: userId } }, { idempotencyKey: `customer-${userId}` });
+  const saved = data?.stripe_customer_id as string | null | undefined;
+  if (saved) {
+    // A saved id can be stale: made in test mode before go-live, or deleted in the dashboard. Replace it then.
+    try {
+      const existing = await stripe().customers.retrieve(saved);
+      if (!("deleted" in existing && existing.deleted)) return existing.id;
+    } catch (e) {
+      if ((e as { code?: string }).code !== "resource_missing") throw e;
+    }
+  }
+  const c = await stripe().customers.create({ email, metadata: { user_id: userId } }, { idempotencyKey: `customer-${userId}-${saved ?? "new"}` });
   await db.from("profiles").update({ stripe_customer_id: c.id }).eq("id", userId);
   return c.id;
 }
