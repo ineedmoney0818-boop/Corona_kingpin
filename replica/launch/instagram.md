@@ -142,3 +142,22 @@ node shots.js                 # screenshots of the live site → shots/
 mkdir -p out && python3 build.py            # voice + timeline → out/*.wav, out/*.json
 node render.js 01-export-trap # frames → out/01-export-trap.mp4 (needs ffmpeg + playwright)
 ```
+
+---
+
+## Automation (Windsor.ai, set up 2026-11-22)
+
+Windsor's `instagram` connector is linked to @reelplain (account `17841444991627510`). Scheduled tasks fire into the Claude Code session that set them up:
+
+| Task | When (ET) | What it does |
+|---|---|---|
+| Post #3 What $19 gets | Tue Nov 24, 7:12 PM | `create_video_post`, caption + "Voice: AI" + hashtags |
+| Post #6 Before/after | Sat Nov 28, 7:12 PM | same |
+| PLAIN comment replies | Daily 10:07, 1:07, 4:07, 7:07, 10:07 | Public reply "link's in our bio", flags anything else |
+| Sunday report | Sun 6:43 PM | Reel insights, sign-ups, what to make next |
+
+Videos are hosted in the public Supabase bucket `marketing` (`/storage/v1/object/public/marketing/reels/<file>.mp4`).
+
+Not automatable through Windsor: DMs, trending audio, Instagram's AI label (so captions say "Voice: AI"). #4 (better filmed on camera) and #5 (waiting on the one-tap copy fix) are not scheduled.
+
+Sign-ups don't record `utm_source`, so Instagram sign-ups can't be separated from others yet.
