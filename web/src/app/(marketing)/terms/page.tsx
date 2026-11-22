@@ -10,7 +10,7 @@ export default function Terms() {
     <LegalPage
       title="Terms of Service"
       effective="November 22, 2026"
-      intro={<p>These terms are an agreement between you and Reelplain, operated by its owner as a sole proprietorship based in Kentucky, USA (&ldquo;we&rdquo;, &ldquo;us&rdquo;). By creating an account or using Reelplain you agree to them. If you don&rsquo;t agree, don&rsquo;t use the service.</p>}
+      intro={<p>These terms are an agreement between you and Outta the Madness LLC, a Kentucky limited liability company that operates Reelplain (&ldquo;we&rdquo;, &ldquo;us&rdquo;). By creating an account or using Reelplain you agree to them. If you don&rsquo;t agree, don&rsquo;t use the service.</p>}
     >
       <h2>The service</h2>
       <p>Reelplain turns your own photos and videos into short social posts (reels and carousels) and suggests ideas for them, using AI to plan the edit. We may change, add or remove features over time.</p>

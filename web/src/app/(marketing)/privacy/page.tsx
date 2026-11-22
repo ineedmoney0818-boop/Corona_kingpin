@@ -9,7 +9,7 @@ export default function Privacy() {
     <LegalPage
       title="Privacy Policy"
       effective="November 22, 2026"
-      intro={<p>Reelplain is operated by its owner as a sole proprietorship based in Kentucky, USA (&ldquo;we&rdquo;, &ldquo;us&rdquo;). This page says what we collect, why, who else sees it, and how to delete it. We don&rsquo;t sell your data and we don&rsquo;t show ads.</p>}
+      intro={<p>Reelplain is operated by Outta the Madness LLC, a Kentucky limited liability company (&ldquo;we&rdquo;, &ldquo;us&rdquo;). This page says what we collect, why, who else sees it, and how to delete it. We don&rsquo;t sell your data and we don&rsquo;t show ads.</p>}
     >
       <h2>What we collect</h2>
       <ul>
